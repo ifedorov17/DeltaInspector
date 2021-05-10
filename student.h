@@ -7,17 +7,17 @@ class Student
 
 public:
     Student();
-    QString *getStudNum();
-    QString *getName();
-    QString *getGroup();
-    void setStudNum(QString *pStudNum);
-    void setName(QString *pName);
-    void setGroup(QString *pGroup);
+    QString getStudNum();
+    QString getName();
+    QString getGroup();
+    void setStudNum(QString &pStudNum);
+    void setName(QString &pName);
+    void setGroup(QString &pGroup);
 
 private:
-    QString *studNum;
-    QString *name;
-    QString *group;
+    QString studNum;
+    QString name;
+    QString group;
 };
 
 #endif // STUDENT_H

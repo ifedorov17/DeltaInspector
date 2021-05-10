@@ -5,32 +5,32 @@ Student::Student()
 
 }
 
-QString *Student::getStudNum()
+QString Student::getStudNum()
 {
     return studNum;
 }
 
-QString *Student::getName()
+QString Student::getName()
 {
     return name;
 }
 
-QString *Student::getGroup()
+QString Student::getGroup()
 {
     return group;
 }
 
-void Student::setStudNum(QString *pStudNum)
+void Student::setStudNum(QString &pStudNum)
 {
     studNum = pStudNum;
 }
 
-void Student::setName(QString *pName)
+void Student::setName(QString &pName)
 {
     name = pName;
 }
 
-void Student::setGroup(QString *pGroup)
+void Student::setGroup(QString &pGroup)
 {
     group = pGroup;
 }
