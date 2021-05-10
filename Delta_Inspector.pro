@@ -10,12 +10,18 @@ CONFIG += c++11
 
 SOURCES += \
     generaldao.cpp \
+    lesson.cpp \
     main.cpp \
-    mainwindow.cpp
+    mainwindow.cpp \
+    student.cpp \
+    visitings.cpp
 
 HEADERS += \
     generaldao.h \
-    mainwindow.h
+    lesson.h \
+    mainwindow.h \
+    student.h \
+    visitings.h
 
 # Default rules for deployment.
 qnx: target.path = /tmp/$${TARGET}/bin
