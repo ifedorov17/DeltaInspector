@@ -1,15 +1,21 @@
 #ifndef STUDENT_H
 #define STUDENT_H
-#include "baseentity.h"
+#include <QString>
 
-class Student: public BaseEntity
+class Student
 {
 
 public:
     Student();
+    QString *getStudNum();
+    QString *getName();
+    QString *getGroup();
+    void setStudNum(QString *pStudNum);
+    void setName(QString *pName);
+    void setGroup(QString *pGroup);
 
 private:
-    QString *stud_num;
+    QString *studNum;
     QString *name;
     QString *group;
 };
