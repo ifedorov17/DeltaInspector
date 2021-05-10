@@ -4,6 +4,9 @@
 #include <QSqlDatabase>
 #include <QSqlQuery>
 #include <QSqlQueryModel>
+#include "lesson.h"
+#include "student.h"
+#include "visitings.h"
 
 class GeneralDAO: public QObject
 {
