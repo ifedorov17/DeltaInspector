@@ -1,15 +1,15 @@
 #ifndef VISITINGS_H
 #define VISITINGS_H
-#include <QString>
+#include "baseentity.h"
 
-class Visitings
+class Visitings : public BaseEntity
 {
 public:
     Visitings();
 private:
     int lesson_id;
-    QString student_id[10]; // номер студака ссылается на Students.STUD_NUM
-    QString visit_time[20]; // дата посещения занятия
+    QString *student_id; // номер студака ссылается на Students.STUD_NUM
+    QString *visit_time; // дата посещения занятия
 };
 
 #endif // VISITINGS_H

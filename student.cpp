@@ -2,5 +2,5 @@
 
 Student::Student()
 {
-
+    class_name = new QString("Student");
 }

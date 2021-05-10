@@ -2,5 +2,5 @@
 
 Visitings::Visitings()
 {
-
+    class_name = new QString("Visitings");
 }
