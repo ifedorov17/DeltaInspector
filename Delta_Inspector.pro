@@ -9,13 +9,21 @@ CONFIG += c++11
 #DEFINES += QT_DISABLE_DEPRECATED_BEFORE=0x060000    # disables all the APIs deprecated before Qt 6.0.0
 
 SOURCES += \
+    baseentity.cpp \
     generaldao.cpp \
+    lesson.cpp \
     main.cpp \
-    mainwindow.cpp
+    mainwindow.cpp \
+    student.cpp \
+    visitings.cpp
 
 HEADERS += \
+    baseentity.h \
     generaldao.h \
-    mainwindow.h
+    lesson.h \
+    mainwindow.h \
+    student.h \
+    visitings.h
 
 # Default rules for deployment.
 qnx: target.path = /tmp/$${TARGET}/bin
