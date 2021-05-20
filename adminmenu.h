@@ -16,6 +16,7 @@ public:
 
 private:
 
+    //main lyt
     QGridLayout *f_LytMain;
 
     QPushButton* f_BtnBackToMenu;
@@ -77,7 +78,11 @@ private:
 
 public slots:
 
+    void resetWidget();
+
     void backToMenu();
+    void refreshListsData();
+    void refreshAttData();
 
     void onNewSubjectClicked();
     void onNewGroupClicked();
