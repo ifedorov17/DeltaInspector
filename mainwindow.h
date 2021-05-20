@@ -66,13 +66,18 @@ private:
 public slots:
 
     void onLoginBtnClicked();
-    void onLoginAccepted();
+    void onLoginAcceptedUser();
+    void onLoginAcceptedAdmin();
     void onLogout();
     void onGroupSelected(const QModelIndex&);
+    void onBackToGroups();
+    void onTimeSelected(const QModelIndex&);
+    void onAdminLogout();
 
 signals:
 
-    void sigLoginAccepted();
+    void sigLoginAcceptedAdmin();
+    void sigLoginAcceptedUser();
 
 };
 #endif // MAINWINDOW_H

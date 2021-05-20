@@ -37,7 +37,8 @@ MainWindow::MainWindow(QWidget *parent)
     f_LytMain->addWidget(f_WidLogin,0,0);
 
     connect(f_BtnLogin, SIGNAL(clicked()), this, SLOT(onLoginBtnClicked()));
-    connect(this, SIGNAL(sigLoginAccepted()), this, SLOT(onLoginAccepted()));
+    connect(this, SIGNAL(sigLoginAcceptedUser()), this, SLOT(onLoginAcceptedUser()));
+    connect(this, SIGNAL(sigLoginAcceptedAdmin()), this, SLOT(onLoginAcceptedAdmin()));
     //*********
 
 
@@ -45,12 +46,14 @@ MainWindow::MainWindow(QWidget *parent)
     f_WidGroups = new QWidget(this);
 
     f_LytGroups = new QGridLayout(this);
+    QLabel *LblGroups = new QLabel("Select a group");
     f_LvGroups = new QListView(this);
     f_LvGroups->setSelectionMode(QAbstractItemView::SingleSelection);
     f_BtnLogout = new QPushButton("Logout",this);
 
     f_LytGroups->addWidget(f_BtnLogout,0,0,Qt::AlignmentFlag::AlignLeft);
-    f_LytGroups->addWidget(f_LvGroups,1,0,Qt::AlignmentFlag::AlignCenter);
+    f_LytGroups->addWidget(LblGroups,1,0,Qt::AlignmentFlag::AlignCenter);
+    f_LytGroups->addWidget(f_LvGroups,2,0,Qt::AlignmentFlag::AlignCenter);
 
     f_WidGroups->setLayout(f_LytGroups);
     f_LytMain->addWidget(f_WidGroups,0,0);
@@ -61,8 +64,40 @@ MainWindow::MainWindow(QWidget *parent)
     connect(f_LvGroups, SIGNAL(clicked(const QModelIndex&)), this, SLOT(onGroupSelected(const QModelIndex&)));
     //*********
 
+    //making layout times
+    f_WidTime = new QWidget(this);
+    f_LytTime = new QGridLayout(this);
 
+    QLabel *LblTime = new QLabel("Select a time");
+    f_LvTimes = new QListView(this);
+    f_LvTimes->setSelectionMode(QAbstractItemView::SingleSelection);
+    f_BtnBackToGroups = new QPushButton("Back");
 
+    f_LytTime->addWidget(f_BtnBackToGroups,0,0,Qt::AlignmentFlag::AlignLeft);
+    f_LytTime->addWidget(LblTime,1,0,Qt::AlignmentFlag::AlignCenter);
+    f_LytTime->addWidget(f_LvTimes,2,0,Qt::AlignmentFlag::AlignCenter);
+
+    f_WidTime->setLayout(f_LytTime);
+    f_LytMain->addWidget(f_WidTime,0,0);
+
+    f_WidTime->hide();
+
+    connect(f_LvTimes, SIGNAL(clicked(const QModelIndex&)), this, SLOT(onGroupSelected(const QModelIndex&)));
+    connect(f_BtnBackToGroups, SIGNAL(clicked()), this, SLOT(onBackToGroups()));
+    //
+
+    //making cam lyt;
+    f_WidCam = new QWidget(this);
+    f_LytCam = new QGridLayout(this);
+    f_LytCam->addWidget(new QRadioButton);
+    //
+
+    //admin menu instance
+    f_AdmMenuIstc = new AdminMenu(this);
+    f_LytMain->addWidget(f_AdmMenuIstc,0,0);
+    f_AdmMenuIstc->hide();
+    connect(f_AdmMenuIstc, SIGNAL(logout()), this, SLOT(onAdminLogout()));
+    //
 
     this->setCentralWidget(f_CentralWidget);
 }
@@ -78,14 +113,12 @@ void MainWindow::onLoginBtnClicked()
 
     if(1 /*Valid login*/)
     {
-
-
-        if(1 /*admin login*/)
-        {
-            f_AdmMenuIstc = new AdminMenu(this);
-            setCentralWidget(f_AdmMenuIstc);
-        }
-        emit sigLoginAccepted();
+        emit sigLoginAcceptedUser();
+        f_LePass->clear();
+    }
+    else if(1 /*admin login*/)
+    {
+        emit sigLoginAcceptedAdmin();
         f_LePass->clear();
     }
     else
@@ -95,12 +128,19 @@ void MainWindow::onLoginBtnClicked()
     }
 }
 
-void MainWindow::onLoginAccepted()
+void MainWindow::onLoginAcceptedUser()
 {
     f_WidLogin->hide();
     f_currentLogin = f_LeLogin->text();
     //DAO access, get groups by login
     f_WidGroups->show();
+}
+
+void MainWindow::onLoginAcceptedAdmin()
+{
+    f_WidLogin->hide();
+    f_currentLogin = f_LeLogin->text();
+    f_AdmMenuIstc->show();
 }
 
 void MainWindow::onLogout()
@@ -109,12 +149,37 @@ void MainWindow::onLogout()
     f_WidLogin->show();
 }
 
-void MainWindow::onGroupSelected(const QModelIndex&)
+void MainWindow::onGroupSelected(const QModelIndex& idx)
 {
-    QItemSelectionModel* select = f_LvGroups->selectionModel();
+    f_currentGroup = f_LvGroups->model()->data(idx).toString();
 
-    QModelIndexList selectedRow = select->selectedRows();
+    qDebug() << f_currentGroup;
 
-    f_LvGroups->model()->data(selectedRow.at(0));
+    f_WidGroups->hide();
+    f_WidTime->show();
+}
+
+void MainWindow::onBackToGroups()
+{
+    f_WidGroups->show();
+    f_WidTime->hide();
+}
+
+void MainWindow::onTimeSelected(const QModelIndex &idx)
+{
+    f_currentTime = f_LvTimes->model()->data(idx).toString();
+
+    qDebug() << f_currentTime;
+
+    f_WidTime->hide();
+    f_WidCam->show();
+
+}
+
+void MainWindow::onAdminLogout()
+{
+    f_AdmMenuIstc->hide();
+    f_WidLogin->show();
+    f_AdmMenuIstc->resetWidget();
 }
 
