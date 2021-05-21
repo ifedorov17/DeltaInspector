@@ -2,11 +2,10 @@
 #include <QDate>
 #include<QDebug>
 
-GeneralDAO *GeneralDAO::getInstance()
+
+GeneralDAO &GeneralDAO::getInstance()
 {
-    if (GeneralDAO::instance == nullptr) {
-        instance = new GeneralDAO();
-    }
+    static GeneralDAO instance;
     return instance;
 }
 
@@ -67,6 +66,9 @@ GeneralDAO::GeneralDAO()
     db.setUserName("student");
     db.setPassword("bmstu");
     db.open();
+
+    if (!db.open()) qDebug() << "FUCCC";
+    else qDebug() << "xaxa lesi4ka";
 
     queryModel = new QSqlQueryModel(this);
 }
