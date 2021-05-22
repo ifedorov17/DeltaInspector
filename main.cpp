@@ -1,11 +1,14 @@
 #include "mainwindow.h"
 
 #include <QApplication>
+#include <QQmlEngine>
 
 int main(int argc, char *argv[])
 {
     QApplication a(argc, argv);
     MainWindow w;
+
+
 
 //    QObject * root = customApp.initializeQML()->rootObjects()[0];
 

@@ -3,6 +3,8 @@
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
 {
+
+    QZXing::registerQMLTypes();
     //pre init
     f_CentralWidget = new QWidget;
     f_LytMain = new QGridLayout;
@@ -82,14 +84,28 @@ MainWindow::MainWindow(QWidget *parent)
 
     f_WidTime->hide();
 
-    connect(f_LvTimes, SIGNAL(clicked(const QModelIndex&)), this, SLOT(onGroupSelected(const QModelIndex&)));
+    connect(f_LvTimes, SIGNAL(clicked(const QModelIndex&)), this, SLOT(onTimeSelected(const QModelIndex&)));
     connect(f_BtnBackToGroups, SIGNAL(clicked()), this, SLOT(onBackToGroups()));
     //
 
     //making cam lyt;
     f_WidCam = new QWidget(this);
     f_LytCam = new QGridLayout(this);
-    f_LytCam->addWidget(new QRadioButton);
+
+    f_cam = new QQuickWidget(this);
+    f_cam->setSource(QUrl(QStringLiteral("qrc:/main.qml")));
+    f_cam->setResizeMode(QQuickWidget::SizeRootObjectToView);
+    //f_LytCam->addWidget(f_cam);
+
+    f_WidCam->setLayout(f_LytCam);
+    f_LytMain->addWidget(f_cam,0,0);
+
+    f_cam->hide();
+
+    connect(f_cam, SIGNAL(qmlSignal(QString)),
+                           this, SLOT(onTagGot(QString)));
+
+
     //
 
     //admin menu instance
@@ -181,5 +197,10 @@ void MainWindow::onAdminLogout()
     f_AdmMenuIstc->hide();
     f_WidLogin->show();
     f_AdmMenuIstc->resetWidget();
+}
+
+void MainWindow::onTagGot(QString tag)
+{
+    qDebug() << tag << "\n         !!!!!!!!!!!!";
 }
 

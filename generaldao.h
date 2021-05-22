@@ -11,14 +11,13 @@
 class GeneralDAO: public QObject
 {
 public:
-    static GeneralDAO* getInstance();
+    static GeneralDAO &getInstance();
     Student *getStudentByStudnum(QString studnum);
     Lesson* getLessonByGroupAndTime(QString group, QString time);
     void doSetVisit(QString studNum, int lessonId);
 
 protected:
     GeneralDAO();
-    static GeneralDAO* instance;
 
 private:
     QSqlDatabase db;

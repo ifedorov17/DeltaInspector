@@ -2,8 +2,10 @@
 #define MAINWINDOW_H
 
 #include <QtWidgets>
+#include <QQuickWidget>
 #include <QMainWindow>
 #include "adminmenu.h"
+#include "QZXing.h"
 
 
 class MainWindow : public QMainWindow
@@ -62,6 +64,7 @@ private:
 
 private:
 
+    QQuickWidget* f_cam;
 
 public slots:
 
@@ -73,6 +76,8 @@ public slots:
     void onBackToGroups();
     void onTimeSelected(const QModelIndex&);
     void onAdminLogout();
+
+    void onTagGot(QString);
 
 signals:
 
