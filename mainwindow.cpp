@@ -1,4 +1,6 @@
 #include "mainwindow.h"
+#include <QQmlApplicationEngine>
+#include <QQmlContext>
 
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
@@ -47,9 +49,20 @@ MainWindow::MainWindow(QWidget *parent)
     //making layout groups
     f_WidGroups = new QWidget(this);
 
+    QStringList *tempGroupsSL = new QStringList;
+    tempGroupsSL->push_back("group1");
+    tempGroupsSL->push_back("group2");
+    tempGroupsSL->push_back("group3");
+
+    QStringListModel *tempGroupsSLM = new QStringListModel(this);
+    tempGroupsSLM->setStringList(*tempGroupsSL);
+
     f_LytGroups = new QGridLayout(this);
     QLabel *LblGroups = new QLabel("Select a group");
     f_LvGroups = new QListView(this);
+
+    f_LvGroups->setModel(tempGroupsSLM);
+
     f_LvGroups->setSelectionMode(QAbstractItemView::SingleSelection);
     f_BtnLogout = new QPushButton("Logout",this);
 
@@ -70,8 +83,21 @@ MainWindow::MainWindow(QWidget *parent)
     f_WidTime = new QWidget(this);
     f_LytTime = new QGridLayout(this);
 
+    QStringList *tempTimesSL = new QStringList;
+    tempTimesSL->push_back("10");
+    tempTimesSL->push_back("12");
+    tempTimesSL->push_back("13");
+
+    QStringListModel *tempTimesSLM = new QStringListModel(this);
+    tempTimesSLM->setStringList(*tempTimesSL);
+
     QLabel *LblTime = new QLabel("Select a time");
     f_LvTimes = new QListView(this);
+
+
+    f_LvTimes->setModel(tempTimesSLM);
+
+
     f_LvTimes->setSelectionMode(QAbstractItemView::SingleSelection);
     f_BtnBackToGroups = new QPushButton("Back");
 
@@ -91,20 +117,46 @@ MainWindow::MainWindow(QWidget *parent)
     //making cam lyt;
     f_WidCam = new QWidget(this);
     f_LytCam = new QGridLayout(this);
+    f_BtnBackToSelections = new QPushButton("Back",this);
+
+    connect(f_BtnBackToSelections, SIGNAL(clicked()), this, SLOT(onBackToSelections()));
+
 
     f_cam = new QQuickWidget(this);
     f_cam->setSource(QUrl(QStringLiteral("qrc:/main.qml")));
-    f_cam->setResizeMode(QQuickWidget::SizeRootObjectToView);
-    //f_LytCam->addWidget(f_cam);
+    f_cam->setResizeMode(QQuickWidget::SizeRootObjectToView);    
+    f_cam->rootContext()->setContextProperty("w", this);
+
+    f_LytCam->addWidget(f_cam,1,0,1,2,Qt::AlignmentFlag::AlignCenter);
+    f_LytCam->addWidget(f_BtnBackToSelections,0,0,1,1,Qt::AlignmentFlag::AlignLeft);
 
     f_WidCam->setLayout(f_LytCam);
-    f_LytMain->addWidget(f_cam,0,0);
 
-    f_cam->hide();
+    f_LytMain->addWidget(f_WidCam,0,0);
 
-    connect(f_cam, SIGNAL(qmlSignal(QString)),
-                           this, SLOT(onTagGot(QString)));
+    f_WidCam->hide();
+    //
 
+    //making verification lyt
+    f_WidVer = new QWidget(this);
+    f_LytVer = new QGridLayout(this);
+    f_BtnVerify = new QPushButton("Verify", this);
+    f_BtnDecline = new QPushButton("Decline", this);
+
+    connect(f_BtnVerify, SIGNAL(clicked()), this, SLOT(onVerified()));
+    connect(f_BtnDecline, SIGNAL(clicked()), this, SLOT(onDeclined()));
+
+    f_LblDataRead = new QLabel(this);
+
+    f_LytVer->addWidget(f_LblDataRead,0,0,1,2,Qt::AlignmentFlag::AlignCenter);
+    f_LytVer->addWidget(f_BtnVerify,1,0,1,1,Qt::AlignmentFlag::AlignCenter);
+    f_LytVer->addWidget(f_BtnDecline,1,1,1,1,Qt::AlignmentFlag::AlignCenter);
+
+    f_WidVer->setLayout(f_LytVer);
+
+    f_LytMain->addWidget(f_WidVer,0,0);
+
+    f_WidVer->hide();
 
     //
 
@@ -120,6 +172,15 @@ MainWindow::MainWindow(QWidget *parent)
 
 MainWindow::~MainWindow()
 {
+}
+
+void MainWindow::dataCleanUp()
+{
+    f_currentLogin.clear();
+    f_currentTime.clear();
+    f_currentGroup.clear();
+    f_StrDataRead.clear();
+    f_currentLessonId = -1;
 }
 
 void MainWindow::onLoginBtnClicked()
@@ -161,6 +222,7 @@ void MainWindow::onLoginAcceptedAdmin()
 
 void MainWindow::onLogout()
 {
+    dataCleanUp();
     f_WidGroups->hide();
     f_WidLogin->show();
 }
@@ -177,6 +239,7 @@ void MainWindow::onGroupSelected(const QModelIndex& idx)
 
 void MainWindow::onBackToGroups()
 {
+    dataCleanUp();
     f_WidGroups->show();
     f_WidTime->hide();
 }
@@ -192,6 +255,32 @@ void MainWindow::onTimeSelected(const QModelIndex &idx)
 
 }
 
+void MainWindow::onBackToSelections()
+{
+    dataCleanUp();
+    f_WidCam->hide();
+    f_WidGroups->show();
+}
+
+void MainWindow::onVerified()
+{
+    //DAO access, add attendance
+    f_LblDataRead->setText("");
+    f_StrDataRead.clear();
+
+    f_WidVer->hide();
+    f_WidCam->show();
+}
+
+void MainWindow::onDeclined()
+{
+    f_LblDataRead->setText("");
+    f_StrDataRead.clear();
+
+    f_WidVer->hide();
+    f_WidCam->show();
+}
+
 void MainWindow::onAdminLogout()
 {
     f_AdmMenuIstc->hide();
@@ -201,6 +290,12 @@ void MainWindow::onAdminLogout()
 
 void MainWindow::onTagGot(QString tag)
 {
-    qDebug() << tag << "\n         !!!!!!!!!!!!";
+    qDebug()<< "\n              !*!*!*!*!*!*!*!*!*!*!*!*!*!*!*!" << tag << "\n              !*!*!*!*!*!*!*!*!*!*!*!*!*!*!*!";
+    f_WidCam->hide();
+
+    f_StrDataRead = tag;
+    f_LblDataRead->setText(f_StrDataRead);
+
+    f_WidVer->show();
 }
 

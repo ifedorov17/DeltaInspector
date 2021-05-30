@@ -22,6 +22,7 @@ private:
     QString f_currentLogin;
     QString f_currentGroup;
     QString f_currentTime;
+    QString f_StrDataRead;
     int f_currentLessonId;
 
 
@@ -52,9 +53,16 @@ private:
     //cam wid
     QWidget *f_WidCam;
     QGridLayout *f_LytCam;
+    QPushButton *f_BtnBackToSelections;
+
+    //verification wid
+    QWidget *f_WidVer;
+    QGridLayout *f_LytVer;
     QPushButton *f_BtnVerify;
     QPushButton *f_BtnDecline;
-    QPushButton *f_BtnBackToSelections;
+    QLabel *f_LblDataRead;
+
+
 
     //admin menu instance
     AdminMenu *f_AdmMenuIstc;
@@ -66,6 +74,10 @@ private:
 
     QQuickWidget* f_cam;
 
+protected:
+
+    void dataCleanUp();
+
 public slots:
 
     void onLoginBtnClicked();
@@ -75,6 +87,9 @@ public slots:
     void onGroupSelected(const QModelIndex&);
     void onBackToGroups();
     void onTimeSelected(const QModelIndex&);
+    void onBackToSelections();
+    void onVerified();
+    void onDeclined();
     void onAdminLogout();
 
     void onTagGot(QString);
