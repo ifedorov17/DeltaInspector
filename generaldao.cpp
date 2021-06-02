@@ -72,3 +72,11 @@ GeneralDAO::GeneralDAO()
 
     queryModel = new QSqlQueryModel(this);
 }
+
+
+
+
+
+
+
+

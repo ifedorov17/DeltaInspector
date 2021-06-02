@@ -133,9 +133,9 @@ AdminMenu::AdminMenu(QWidget *parent)
     f_LytAddLesson = new QGridLayout(this);
     QLabel *LblAddLess = new QLabel("Add new lesson");
     f_BtnAcceptLesson = new QPushButton("Accept info");
-    QLabel *LblAddLessonUsers = new QLabel("Available teacher logins");
+    QLabel *LblAddLessonUsers = new QLabel("Available\nteacher\nlogins");
     f_LvAddLessonUsers = new QListView(this);
-    QLabel *LblAddLessonGroups = new QLabel("Availablegroupindexes");
+    QLabel *LblAddLessonGroups = new QLabel("Available\ngroup\nindexes");
     f_LvAddLessonGroups = new QListView(this);
     QLabel *LblLessAmout = new QLabel("Amount of lessons\nduring semestre:");
     f_LessonsAmount = new QSpinBox(this);
@@ -150,7 +150,6 @@ AdminMenu::AdminMenu(QWidget *parent)
     f_AddLessonDay->addItem("Thu");
     f_AddLessonDay->addItem("Fri");
     f_AddLessonDay->addItem("Sat");
-    f_AddLessonDay->addItem("Sun");
 
     QLabel *LblLessTime = new QLabel("Time:");
     f_AddLessonTime = new QComboBox(this);
@@ -194,6 +193,17 @@ AdminMenu::AdminMenu(QWidget *parent)
     f_TvAtt = new QTableView(this);
     QLabel *LblAttGroup = new QLabel("Available\ngroup\nindexes");
     f_Groups = new QListView(this);
+
+    QLabel *LblAttDay = new QLabel("Day:");
+    f_Days = new QComboBox(this);
+
+    f_Days->addItem("Mon");
+    f_Days->addItem("Tue");
+    f_Days->addItem("Wen");
+    f_Days->addItem("Thu");
+    f_Days->addItem("Fri");
+    f_Days->addItem("Sat");
+
     QLabel *LblAttTimes = new QLabel("Time");
     f_Times = new QComboBox(this);
 
@@ -209,9 +219,11 @@ AdminMenu::AdminMenu(QWidget *parent)
     f_LytAttCheck->addWidget(f_TvAtt,2,0,1,2,Qt::AlignmentFlag::AlignCenter);
     f_LytAttCheck->addWidget(LblAttGroup,3,0,Qt::AlignmentFlag::AlignRight);
     f_LytAttCheck->addWidget(f_Groups,3,1,Qt::AlignmentFlag::AlignCenter);
-    f_LytAttCheck->addWidget(LblAttTimes,4,0,Qt::AlignmentFlag::AlignRight);
-    f_LytAttCheck->addWidget(f_Times,4,1,Qt::AlignmentFlag::AlignCenter);
-    f_LytAttCheck->addWidget(f_BtnRefresh,5,1,1,2,Qt::AlignmentFlag::AlignCenter);
+    f_LytAttCheck->addWidget(LblAttDay,4,0,Qt::AlignmentFlag::AlignRight);
+    f_LytAttCheck->addWidget(f_Days,4,1,Qt::AlignmentFlag::AlignCenter);
+    f_LytAttCheck->addWidget(LblAttTimes,5,0,Qt::AlignmentFlag::AlignRight);
+    f_LytAttCheck->addWidget(f_Times,5,1,Qt::AlignmentFlag::AlignCenter);
+    f_LytAttCheck->addWidget(f_BtnRefresh,6,1,1,2,Qt::AlignmentFlag::AlignCenter);
 
     f_WidAttCheck->setLayout(f_LytAttCheck);
     f_LytMain->addWidget(f_WidAttCheck,1,0,Qt::AlignmentFlag::AlignCenter);
@@ -224,6 +236,67 @@ AdminMenu::AdminMenu(QWidget *parent)
     connect(f_BtnRefresh, SIGNAL(clicked()), this, SLOT(refreshAttData()));
 
     setLayout(f_LytMain);
+}
+
+void AdminMenu::styling()
+{
+    setStyleSheet(""
+"QWidget {"
+"background-color: rgb(32,32,32)"
+"}"
+""
+"QLabel {"
+"color: rgb(150,150,150);"
+"font: bold 11px;"
+"}"
+""
+"QLineEdit { "
+"background-color: rgb(64,64,64);"
+"border: 2px solid rgb(56,56,56);"
+"border-radius: 4px;"
+"selection-background-color: rgb(110,110,150); "
+"color: rgb(150,150,150);"
+"}"
+""
+"QPushButton {"
+"background-color: rgb(25,25,25);"
+"border-width: 2px solid;"
+"border-radius: 4px;"
+"font: bold 12px;"
+"color: rgb(150,150,150);"
+"padding: 6px;"
+"}"
+""
+"QPushButton:pressed {"
+"background-color: rgb(64, 64, 64);"
+"}"
+""
+"QListView {"
+"background-color: rgb(46,46,46);"
+"alternate-background-color: rgb(32,32,32);"
+"border: 2px solid rgb(56,56,56);"
+"color: rgb(150,150,150);"
+"}"
+""
+"QListView::item:selected {"
+"border: 2px solid rgb(110,110,150);"
+"}"
+""
+"QTableView {"
+"background-color: rgb(46,46,46);"
+"border: 2px solid rgb(56,56,56);"
+"color: rgb(150,150,150);"
+"}"
+""
+"QComboBox {"
+"background-color: rgb(46,46,46);"
+"border: 2px solid rgb(56,56,56);"
+"border-radius: 3px"
+"color: rgb(150,150,150);"
+"font: bold 12px;"
+"}"
+""
+);
 }
 
 void AdminMenu::resetWidget()
@@ -251,11 +324,16 @@ void AdminMenu::backToMenu()
 
 void AdminMenu::refreshListsData()
 {
+    QSqlQueryModel* model = GeneralDAO::getInstance().getAllGroupIds();
+    f_LvAddLessonGroups->setModel(model);
+    f_LvAddLessonUsers->setModel(GeneralDAO::getInstance().getAllTeacherLogins());
+    f_LvStGroup->setModel(model);
     //DAO access filling in the data fields e.g. ListViews for groups and logins
 }
 
 void AdminMenu::refreshAttData()
 {
+    //f_TvAtt->setModel(GeneralDAO::getInstance().getVisitingsByGroupTime(f_Groups->model->data(f_Groups->selectionModel()->selectedIndexes().at(0)).toString(),));
     //DAO access filling in the data fields e.g. Filling the TableView for attendance
 }
 

@@ -13,6 +13,8 @@ MainWindow::MainWindow(QWidget *parent)
     f_CentralWidget->setLayout(f_LytMain);
     //*********
 
+    styling();
+
     //making login layout
     f_WidLogin = new QWidget(this);
 
@@ -20,12 +22,12 @@ MainWindow::MainWindow(QWidget *parent)
     f_BtnLogin = new QPushButton("Login", this);
     f_LeLogin = new QLineEdit(this);
     f_LePass = new QLineEdit(this);
+    f_LePass->setEchoMode(QLineEdit::Password);
 
     QLabel* LblLogin = new QLabel("Login:", this);
     QLabel* LblPass = new QLabel("Password:", this);
     f_LblWrong = new QLabel("Wrong login or password.", this);
     f_LblWrong->setStyleSheet("QLabel { color : red; }");
-
 
     f_LytLogin->addWidget(LblLogin,0,0,Qt::AlignmentFlag::AlignCenter);
     f_LytLogin->addWidget(f_LeLogin,1,0,Qt::AlignmentFlag::AlignCenter);
@@ -93,7 +95,6 @@ MainWindow::MainWindow(QWidget *parent)
 
     QLabel *LblTime = new QLabel("Select a time");
     f_LvTimes = new QListView(this);
-
 
     f_LvTimes->setModel(tempTimesSLM);
 
@@ -174,6 +175,64 @@ MainWindow::~MainWindow()
 {
 }
 
+void MainWindow::styling()
+{
+    setStyleSheet(""
+"QWidget {"
+"background-color: rgb(32,32,32)"
+"}"
+""
+"QLabel {"
+"color: rgb(150,150,150);"
+"font: bold 11px;"
+"}"
+""
+"QLineEdit { "
+"background-color: rgb(64,64,64);"
+"border: 2px solid rgb(56,56,56);"
+"border-radius: 4px;"
+"selection-background-color: rgb(110,110,150); "
+"color: rgb(150,150,150);"
+"}"
+""
+"QPushButton {"
+"background-color: rgb(25,25,25);"
+"border-width: 2px solid;"
+"border-radius: 4px;"
+"font: bold 12px;"
+"color: rgb(150,150,150);"
+"padding: 6px;"
+"}"
+""
+"QPushButton:pressed {"
+"background-color: rgb(64, 64, 64);"
+"}"
+""
+"QListView {"
+"background-color: rgb(46,46,46);"
+"alternate-background-color: rgb(32,32,32);"
+"border: 2px solid rgb(56,56,56);"
+"color: rgb(150,150,150);"
+"}"
+""
+"QTableView {"
+"background-color: rgb(46,46,46);"
+"border: 2px solid rgb(56,56,56);"
+"color: rgb(150,150,150);"
+"}"
+""
+"QComboBox {"
+"background-color: rgb(46,46,46);"
+"border: 2px solid rgb(56,56,56);"
+"border-radius: 3px"
+"color: rgb(150,150,150);"
+"font: bold 12px;"
+"}"
+""
+);
+
+}
+
 void MainWindow::dataCleanUp()
 {
     f_currentLogin.clear();
@@ -186,14 +245,17 @@ void MainWindow::dataCleanUp()
 void MainWindow::onLoginBtnClicked()
 {
     //DAO access, validate login/pass
+
+    int option = GeneralDAO::getInstance().validateLoginPass(f_LeLogin->text(), f_LePass->text());
+
     f_LblWrong->hide();
 
-    if(1 /*Valid login*/)
+    if(option == 0 /*Valid login*/)
     {
         emit sigLoginAcceptedUser();
         f_LePass->clear();
     }
-    else if(1 /*admin login*/)
+    else if(option == 1 /*admin login*/)
     {
         emit sigLoginAcceptedAdmin();
         f_LePass->clear();
@@ -210,6 +272,7 @@ void MainWindow::onLoginAcceptedUser()
     f_WidLogin->hide();
     f_currentLogin = f_LeLogin->text();
     //DAO access, get groups by login
+    f_LvGroups->setModel(GeneralDAO::getInstance().getGroupsByLogin(f_currentLogin));
     f_WidGroups->show();
 }
 
@@ -227,10 +290,11 @@ void MainWindow::onLogout()
     f_WidLogin->show();
 }
 
-void MainWindow::onGroupSelected(const QModelIndex& idx)
+void MainWindow::onGroup(const QModelIndex& idx)
 {
     f_currentGroup = f_LvGroups->model()->data(idx).toString();
-
+    //DAO access get associated times
+    f_LvTimes->setModel(GeneralDAO::getInstance().getTimesByLoginGroup(f_currentGroup, f_currentLogin));
     qDebug() << f_currentGroup;
 
     f_WidGroups->hide();
@@ -247,7 +311,7 @@ void MainWindow::onBackToGroups()
 void MainWindow::onTimeSelected(const QModelIndex &idx)
 {
     f_currentTime = f_LvTimes->model()->data(idx).toString();
-
+    f_currentLessonId = GeneralDAO::getInstance().getLessonIdByPK(f_currentGroup, f_currentTime);
     qDebug() << f_currentTime;
 
     f_WidTime->hide();
@@ -265,6 +329,15 @@ void MainWindow::onBackToSelections()
 void MainWindow::onVerified()
 {
     //DAO access, add attendance
+    Visitings att;
+
+    att.setLessonId(f_currentLessonId);
+    att.setStudentId(&f_StrDataRead);
+    att.setVisitTime(&f_currentTime);
+
+    GeneralDAO::getInstance().addVisiting(att);
+
+
     f_LblDataRead->setText("");
     f_StrDataRead.clear();
 

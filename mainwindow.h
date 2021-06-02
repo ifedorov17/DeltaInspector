@@ -1,6 +1,8 @@
 #ifndef MAINWINDOW_H
 #define MAINWINDOW_H
 
+
+#include "generaldao.h"
 #include <QtWidgets>
 #include <QQuickWidget>
 #include <QMainWindow>
@@ -15,6 +17,7 @@ class MainWindow : public QMainWindow
 public:
     MainWindow(QWidget *parent = nullptr);
     ~MainWindow();
+
 
 private:
 
@@ -73,6 +76,10 @@ private:
 private:
 
     QQuickWidget* f_cam;
+
+private:
+
+    void styling();
 
 protected:
 
