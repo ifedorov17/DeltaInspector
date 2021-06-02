@@ -1,6 +1,7 @@
 #ifndef ADMINMENU_H
 #define ADMINMENU_H
 
+#include "generaldao.h"
 #include "QtWidgets"
 
 
@@ -68,9 +69,13 @@ private:
     QGridLayout *f_LytAttCheck;
     QTableView *f_TvAtt;
     QListView *f_Groups;
+    QComboBox *f_Days;
     QComboBox *f_Times;
     QPushButton *f_BtnRefresh;
 
+
+
+    void styling();
 
 
     friend class MainWindow;
