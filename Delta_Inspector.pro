@@ -11,6 +11,8 @@ CONFIG += qzxing_multimedia \
           enable_decoder_aztec \
           enable_decoder_pdf17
 
+CONFIG += enable_encoder_qr_code
+
 # You can make your code fail to compile if it uses deprecated APIs.
 # In order to do so, uncomment the following line.
 #DEFINES += QT_DISABLE_DEPRECATED_BEFORE=0x060000    # disables all the APIs deprecated before Qt 6.0.0
@@ -25,6 +27,7 @@ SOURCES += \
     visitings.cpp
 
 HEADERS += \
+    QrEncoder.h \
     adminmenu.h \
     generaldao.h \
     lesson.h \
@@ -32,8 +35,7 @@ HEADERS += \
     student.h \
     visitings.h
 
-
-
+include(src/QZXing.pri)
 include(src/QZXing-components.pri)
 include(deployment.pri)
 

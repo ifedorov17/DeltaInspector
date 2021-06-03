@@ -84,6 +84,7 @@ private:
 protected:
 
     void dataCleanUp();
+    void dataRefresh();
 
 public slots:
 

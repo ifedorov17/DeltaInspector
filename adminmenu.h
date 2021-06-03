@@ -6,6 +6,8 @@
 
 
 
+
+
 class AdminMenu : public QWidget
 {
     Q_OBJECT
@@ -74,7 +76,6 @@ private:
     QPushButton *f_BtnRefresh;
 
 
-
     void styling();
 
 
@@ -86,7 +87,6 @@ public slots:
     void resetWidget();
 
     void backToMenu();
-    void refreshListsData();
     void refreshAttData();
 
     void onNewSubjectClicked();

@@ -10,12 +10,12 @@ int Visitings::getLessonId()
     return lessonId;
 }
 
-QString *Visitings::getStudentId()
+QString Visitings::getStudentId() const
 {
     return studentId;
 }
 
-QString *Visitings::getVisitTime()
+QString Visitings::getVisitTime() const
 {
     return visitTime;
 }
@@ -25,12 +25,12 @@ void Visitings::setLessonId(int pId)
     lessonId = pId;
 }
 
-void Visitings::setStudentId(QString *pStudentId)
+void Visitings::setStudentId(const QString &pStudentId)
 {
     studentId = pStudentId;
 }
 
-void Visitings::setVisitTime(QString *pVisitTime)
+void Visitings::setVisitTime(const QString &pVisitTime)
 {
     visitTime = pVisitTime;
 }
