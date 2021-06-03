@@ -5,47 +5,47 @@ Lesson::Lesson()
 
 }
 
-QString *Lesson::getName()
+QString Lesson::getName() const
 {
     return naming;
 }
 
-QString *Lesson::getLessonTime()
+QString Lesson::getLessonTime() const
 {
     return lessonTime;
 }
 
-QString *Lesson::getGroup()
+QString Lesson::getGroup() const
 {
     return group;
 }
 
-int Lesson::getId()
+int Lesson::getId() const
 {
     return id;
 }
 
-int Lesson::getAmount()
+int Lesson::getAmount() const
 {
     return amount;
 }
 
-QString *Lesson::getTeacher()
+QString Lesson::getTeacher() const
 {
     return teacher;
 }
 
-void Lesson::setName(QString *pName)
+void Lesson::setName(const QString &pName)
 {
     naming = pName;
 }
 
-void Lesson::setLessonTime(QString *pLessonTime)
+void Lesson::setLessonTime(const QString &pLessonTime)
 {
     lessonTime = pLessonTime;
 }
 
-void Lesson::setGroup(QString *pGroup)
+void Lesson::setGroup(const QString &pGroup)
 {
     group = pGroup;
 }
@@ -60,7 +60,7 @@ void Lesson::setAmount(int pAmount)
     amount = pAmount;
 }
 
-void Lesson::setTeacher(QString *pTeacher)
+void Lesson::setTeacher(const QString &pTeacher)
 {
     teacher = pTeacher;
 }

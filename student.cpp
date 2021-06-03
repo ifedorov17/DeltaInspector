@@ -5,32 +5,32 @@ Student::Student()
 
 }
 
-QString *Student::getStudNum()
+QString Student::getStudNum() const
 {
     return studNum;
 }
 
-QString *Student::getName()
+QString Student::getName() const
 {
     return name;
 }
 
-QString *Student::getGroup()
+QString Student::getGroup() const
 {
     return group;
 }
 
-void Student::setStudNum(QString *pStudNum)
+void Student::setStudNum(const QString &pStudNum)
 {
     studNum = pStudNum;
 }
 
-void Student::setName(QString *pName)
+void Student::setName(const QString &pName)
 {
     name = pName;
 }
 
-void Student::setGroup(QString *pGroup)
+void Student::setGroup(const QString &pGroup)
 {
     group = pGroup;
 }

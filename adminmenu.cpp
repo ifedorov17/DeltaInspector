@@ -1,4 +1,7 @@
 #include "adminmenu.h"
+#include "QrEncoder.h"
+
+
 
 AdminMenu::AdminMenu(QWidget *parent)
     : QWidget(parent)
@@ -190,9 +193,9 @@ AdminMenu::AdminMenu(QWidget *parent)
     f_LytAttCheck = new QGridLayout(this);
     f_BtnRefresh = new QPushButton("Refresh",this);
     QLabel *LblAttCheck = new QLabel("Attandance check");
-    f_TvAtt = new QTableView(this);
+    f_TvAtt = new QTableView();
     QLabel *LblAttGroup = new QLabel("Available\ngroup\nindexes");
-    f_Groups = new QListView(this);
+    f_Groups = new QListView();
 
     QLabel *LblAttDay = new QLabel("Day:");
     f_Days = new QComboBox(this);
@@ -322,18 +325,19 @@ void AdminMenu::backToMenu()
     resetWidget();
 }
 
-void AdminMenu::refreshListsData()
-{
-    QSqlQueryModel* model = GeneralDAO::getInstance().getAllGroupIds();
-    f_LvAddLessonGroups->setModel(model);
-    f_LvAddLessonUsers->setModel(GeneralDAO::getInstance().getAllTeacherLogins());
-    f_LvStGroup->setModel(model);
-    //DAO access filling in the data fields e.g. ListViews for groups and logins
-}
-
 void AdminMenu::refreshAttData()
 {
-    //f_TvAtt->setModel(GeneralDAO::getInstance().getVisitingsByGroupTime(f_Groups->model->data(f_Groups->selectionModel()->selectedIndexes().at(0)).toString(),));
+    f_LblErr->hide();
+
+    if(f_Groups->selectionModel()->selectedIndexes().size() == 0)
+    {
+        f_LblErr->show();
+        return;
+    }
+
+    QString tech1 = f_Groups->model()->data(f_Groups->selectionModel()->selectedIndexes().at(0)).toString();
+    f_TvAtt->setModel(GeneralDAO::getInstance().getVisitingsByGroupTime(tech1, f_Days->currentText() + " " + f_Times->currentText()));
+
     //DAO access filling in the data fields e.g. Filling the TableView for attendance
 }
 
@@ -353,6 +357,9 @@ void AdminMenu::onNewGroupClicked()
 
 void AdminMenu::onNewLessonClicked()
 {
+    QSqlQueryModel* model = GeneralDAO::getInstance().getAllGroupIds();
+    f_LvAddLessonGroups->setModel(model);
+    f_LvAddLessonUsers->setModel(GeneralDAO::getInstance().getAllTeacherLogins());
     f_WidMenu->hide();
     f_WidAddLesson->show();
     f_BtnBackToMenu->show();
@@ -360,6 +367,8 @@ void AdminMenu::onNewLessonClicked()
 
 void AdminMenu::onNewStudentClicked()
 {
+    QSqlQueryModel* model = GeneralDAO::getInstance().getAllGroupIds();
+    f_LvStGroup->setModel(model);
     f_WidMenu->hide();
     f_WidAddStudent->show();
     f_BtnBackToMenu->show();
@@ -367,6 +376,9 @@ void AdminMenu::onNewStudentClicked()
 
 void AdminMenu::onAttCheckClicked()
 {
+    QSqlQueryModel* model = GeneralDAO::getInstance().getAllGroupIds();
+    f_Groups->setModel(model);
+
     f_WidMenu->hide();
     f_WidAttCheck->show();
     f_BtnBackToMenu->show();
@@ -379,6 +391,9 @@ void AdminMenu::onLogoutClicked()
 
 void AdminMenu::onAcceptStInfoClicked()
 {
+    paintQR(f_LeStudNum->text());
+
+
     f_LblErr->hide();
 
     if(f_LeStName->text().isEmpty()
@@ -406,6 +421,13 @@ void AdminMenu::onAcceptStInfoClicked()
         }
 
     //DAO access add Student
+        Student student;
+
+        student.setGroup(f_LvStGroup->model()->data(f_LvStGroup->selectionModel()->selectedIndexes().at(0)).toString());
+        student.setName(f_LeStName->text());
+        student.setStudNum(f_LeStudNum->text());
+
+        GeneralDAO::getInstance().addStudent(student);
 
         backToMenu();
     }
@@ -423,6 +445,8 @@ void AdminMenu::onAcceptGrInfoClicked()
     else
     {
     //DAO access add Group
+        GeneralDAO::getInstance().addGroup(f_LeGroup->text());
+
         backToMenu();
     }
 }
@@ -455,6 +479,15 @@ void AdminMenu::onAcceptLessInfoClicked()
         }
 
         //DAO access add Lesson
+        Lesson less;
+
+        less.setAmount(f_LessonsAmount->value());
+        less.setGroup(f_LvAddLessonGroups->model()->data(f_LvAddLessonGroups->selectionModel()->selectedIndexes().at(0)).toString());
+        less.setLessonTime(f_AddLessonDay->currentData().toString() + " " + f_AddLessonTime->currentData().toString());
+        less.setName(" AA ");           ///!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+        less.setTeacher(f_LvAddLessonUsers->model()->data(f_LvAddLessonUsers->selectionModel()->selectedIndexes().at(0)).toString());
+
+        GeneralDAO::getInstance().addLesson(less);
 
         backToMenu();
     }
@@ -472,6 +505,7 @@ void AdminMenu::onAcceptSubjInfoClicked()
     else
     {
     //DAO access add Subject
+        GeneralDAO::getInstance().addSubject(f_LeSubject->text());
         backToMenu();
     }
 }

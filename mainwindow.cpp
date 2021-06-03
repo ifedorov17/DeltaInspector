@@ -5,7 +5,6 @@
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
 {
-
     QZXing::registerQMLTypes();
     //pre init
     f_CentralWidget = new QWidget;
@@ -242,6 +241,11 @@ void MainWindow::dataCleanUp()
     f_currentLessonId = -1;
 }
 
+void MainWindow::dataRefresh()
+{
+
+}
+
 void MainWindow::onLoginBtnClicked()
 {
     //DAO access, validate login/pass
@@ -250,12 +254,12 @@ void MainWindow::onLoginBtnClicked()
 
     f_LblWrong->hide();
 
-    if(option == 0 /*Valid login*/)
+    if(/*option ==*/ 0  /*Valid login*/)
     {
         emit sigLoginAcceptedUser();
         f_LePass->clear();
     }
-    else if(option == 1 /*admin login*/)
+    else if(/*option ==*/ 1 /*admin login*/)
     {
         emit sigLoginAcceptedAdmin();
         f_LePass->clear();
@@ -285,12 +289,11 @@ void MainWindow::onLoginAcceptedAdmin()
 
 void MainWindow::onLogout()
 {
-    dataCleanUp();
     f_WidGroups->hide();
     f_WidLogin->show();
 }
 
-void MainWindow::onGroup(const QModelIndex& idx)
+void MainWindow::onGroupSelected(const QModelIndex& idx)
 {
     f_currentGroup = f_LvGroups->model()->data(idx).toString();
     //DAO access get associated times
@@ -303,7 +306,7 @@ void MainWindow::onGroup(const QModelIndex& idx)
 
 void MainWindow::onBackToGroups()
 {
-    dataCleanUp();
+    f_LvGroups->setModel(GeneralDAO::getInstance().getGroupsByLogin(f_currentLogin));
     f_WidGroups->show();
     f_WidTime->hide();
 }
@@ -317,11 +320,12 @@ void MainWindow::onTimeSelected(const QModelIndex &idx)
     f_WidTime->hide();
     f_WidCam->show();
 
+
 }
 
 void MainWindow::onBackToSelections()
 {
-    dataCleanUp();
+    f_LvGroups->setModel(GeneralDAO::getInstance().getGroupsByLogin(f_currentLogin));
     f_WidCam->hide();
     f_WidGroups->show();
 }
@@ -329,13 +333,8 @@ void MainWindow::onBackToSelections()
 void MainWindow::onVerified()
 {
     //DAO access, add attendance
-    Visitings att;
 
-    att.setLessonId(f_currentLessonId);
-    att.setStudentId(&f_StrDataRead);
-    att.setVisitTime(&f_currentTime);
-
-    GeneralDAO::getInstance().addVisiting(att);
+    GeneralDAO::getInstance().doSetVisit(f_StrDataRead, f_currentLessonId);
 
 
     f_LblDataRead->setText("");
