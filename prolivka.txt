@@ -10,17 +10,39 @@ NAME varchar(100),
 GRUPPA varchar(20) references DI_GRUPPS(GRUPP_NUM) ON DELETE no action)
 
 create table DI_LESSONS(
-NAMING varchar(100) references DI_SUBJECT(name),
+NAMING varchar(100) references DI_SUBJECT(name) on delete cascade,
 LESSON_TIME varchar(50) NOT NULL,
-GRUPPA varchar(20) references DI_GRUPPS(GRUPP_NUM),
+GRUPPA varchar(20) references DI_GRUPPS(GRUPP_NUM) on delete cascade,
 ID serial unique,
 NUMBER integer not null,
-TEACHER varchar(50) references DI_USERS(login),
+TEACHER varchar(50) references DI_USERS(login) on delete cascade,
 PRIMARY KEY(gruppa,lesson_time))
 
 create table DI_VISITINGS(
 LESSON_ID integer references DI_LESSONS(id),
-STUDENT_ID varchar(10) references DI_STUDENTS(stud_num),
+STUDENT_ID varchar(10) references DI_STUDENTS(stud_num) on delete cascade,
 VISIT_TIME date,
 PRIMARY KEY(lesson_id,student_id,visit_time))
 
+insert into DI_GRUPPS values('ФН11-42Б'),('ФН11-43Б')
+
+insert into DI_USERS values
+	('floppa123','qwerty%5',TRUE,'Темный властелин')
+
+insert into DI_USERS values
+	('deryabina','qwerty%5',FALSE,'Дерябина Г.С.')
+
+insert into di_subject values 
+	('ТФКП'),
+	('КиКИ'),
+	('Алгебра')
+
+insert into DI_STUDENTS values ('19Ф142','Федоров И.А.','ФН11-42Б')
+
+insert into DI_LESSONS(NAMING,LESSON_TIME,GRUPPA,NUMBER,TEACHER) values (
+	'ТФКП',
+	'Fri 15:40',
+	'ФН11-42Б',
+	17,
+	'Дерябина Г.С.'
+)
