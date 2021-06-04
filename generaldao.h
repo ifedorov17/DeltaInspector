@@ -47,6 +47,7 @@ public:
 
     QSqlQueryModel* getTimesByLoginGroup(const QString& group,    // Added
                                          const QString& login);
+    QSqlQueryModel* getAllSubjects();
 
 protected:
     GeneralDAO();

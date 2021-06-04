@@ -30,17 +30,6 @@ Item
         anchors.fill: videoOutput
     }
 
-    Text
-    {
-        id: text1
-        wrapMode: Text.Wrap
-        font.pixelSize: 20
-        anchors.top: parent.top
-        anchors.left: parent.left
-        z: 50
-        text: "Tags detected: " + detectedTags
-    }
-
 
     Camera
     {
