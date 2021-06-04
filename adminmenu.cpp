@@ -1,6 +1,6 @@
 #include "adminmenu.h"
 #include "QrEncoder.h"
-
+#include "src/SmtpMime"
 
 
 AdminMenu::AdminMenu(QWidget *parent)
@@ -402,7 +402,7 @@ void AdminMenu::onLogoutClicked()
 
 void AdminMenu::onAcceptStInfoClicked()
 {
-    paintQR(f_LeStudNum->text());
+
 
 
     f_LblErr->hide();
@@ -431,6 +431,8 @@ void AdminMenu::onAcceptStInfoClicked()
             }
         }
 
+        paintQR(f_LeStudNum->text());
+
     //DAO access add Student
         Student student;
 
@@ -439,6 +441,29 @@ void AdminMenu::onAcceptStInfoClicked()
         student.setStudNum(f_LeStudNum->text());
 
         GeneralDAO::getInstance().addStudent(student);
+
+        SmtpClient smtp("smtp.gmail.com", 465, SmtpClient::SslConnection);
+
+                smtp.setUser("deltainspectortech@gmail.com");
+                smtp.setPassword("xaxalesichka");
+
+                MimeMessage message;
+
+                message.setSender(new EmailAddress("deltainspectortech@gmail.com", "DeltaInspector"));
+                message.addRecipient(new EmailAddress(f_eMail->text(), f_LeStName->text()));
+                message.setSubject("Your registration qr code");
+
+                MimeText text;
+                text.setText("Greetings!\n This is Delta Inspetor Group.\nYour Qr registration code is attached!");
+                message.addPart(&text);
+
+                MimeAttachment attachment (new QFile("QR.png"));
+                message.addPart(&attachment);
+
+                smtp.connectToHost();
+                smtp.login();
+                smtp.sendMail(message);
+                smtp.quit();
 
         backToMenu();
     }
