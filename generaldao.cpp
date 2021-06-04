@@ -9,6 +9,12 @@ GeneralDAO &GeneralDAO::getInstance()
     return instance;
 }
 
+GeneralDAO *GeneralDAO::getPtr()
+{
+    static GeneralDAO instance;
+    return &instance;
+}
+
 Student *GeneralDAO::getStudentByStudnum(QString studnum)
 {
     QSqlQueryModel* queryModel = new QSqlQueryModel;
@@ -119,7 +125,7 @@ bool GeneralDAO::addStudent(const Student &student)
 
 
     queryModel->setQuery("INSERT INTO di_students VALUES ('"+student.getStudNum()+"','"+student.getName()+"','"+student.getGroup()+"');");
-    if(queryModel == nullptr)
+    if(queryModel->lastError().type() != QSqlError::NoError)
     {
         return false;
     }
@@ -135,7 +141,7 @@ bool GeneralDAO::addGroup(const QString &groupId)
 
 
     queryModel->setQuery("INSERT INTO di_grupps VALUES ('"+groupId+"');");
-    if(queryModel == nullptr)
+    if(queryModel->lastError().type() != QSqlError::NoError)
     {
         return false;
     }
@@ -161,7 +167,7 @@ bool GeneralDAO::addLesson(const Lesson &lesson)
                         +lesson.getTeacher()+"');"
 );
 
-    if(queryModel == nullptr)
+    if(queryModel->lastError().type() != QSqlError::NoError)
     {
         return false;
     }
@@ -176,7 +182,7 @@ bool GeneralDAO::addSubject(const QString &subjectName)
     QSqlQueryModel* queryModel = new QSqlQueryModel;
 
     queryModel->setQuery("INSERT INTO di_subject VALUES ('"+subjectName+"');");
-    if(queryModel == nullptr)
+    if(queryModel->lastError().type() != QSqlError::NoError)
     {
         return false;
     }

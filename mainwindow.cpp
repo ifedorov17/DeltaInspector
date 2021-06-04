@@ -1,6 +1,7 @@
 #include "mainwindow.h"
 #include <QQmlApplicationEngine>
 #include <QQmlContext>
+#include <stdlib.h>
 
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
@@ -166,7 +167,6 @@ MainWindow::MainWindow(QWidget *parent)
     f_AdmMenuIstc->hide();
     connect(f_AdmMenuIstc, SIGNAL(logout()), this, SLOT(onAdminLogout()));
     //
-
     this->setCentralWidget(f_CentralWidget);
 }
 
@@ -358,6 +358,13 @@ void MainWindow::onAdminLogout()
     f_AdmMenuIstc->hide();
     f_WidLogin->show();
     f_AdmMenuIstc->resetWidget();
+}
+
+void MainWindow::onQueryError(const QString& p_Error)
+{
+    this->statusBar()->showMessage(p_Error);
+    Sleep(200);
+    this->statusBar()->clearMessage();
 }
 
 void MainWindow::onTagGot(QString tag)

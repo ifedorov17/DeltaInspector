@@ -14,6 +14,7 @@ class GeneralDAO: public QObject
 {
 public:
     static GeneralDAO &getInstance();
+    static GeneralDAO *getPtr();
     Student *getStudentByStudnum(QString studnum);
     Lesson *getLessonByGroupAndTime(QString group, QString time);
     void doSetVisit(QString studNum, int lessonId);
@@ -54,6 +55,9 @@ protected:
 
 private:
     QSqlDatabase db;
+
+signals:
+
 
 };
 

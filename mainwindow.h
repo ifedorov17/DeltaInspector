@@ -99,6 +99,7 @@ public slots:
     void onVerified();
     void onDeclined();
     void onAdminLogout();
+    void onQueryError(const QString&);
 
     void onTagGot(QString);
 
