@@ -56,6 +56,7 @@ AdminMenu::AdminMenu(QWidget *parent)
     QLabel *LblAddStudent = new QLabel("Add new student");
     f_LeStName = new QLineEdit(this);
     f_LvStGroup = new QListView(this);
+    f_LvStGroup->setSelectionMode(QAbstractItemView::SingleSelection);
     f_LeStudNum = new QLineEdit(this);
     f_eMail = new QLineEdit(this);
     f_BtnAcceptStudent = new QPushButton("Accept info",this);
@@ -138,8 +139,13 @@ AdminMenu::AdminMenu(QWidget *parent)
     f_BtnAcceptLesson = new QPushButton("Accept info");
     QLabel *LblAddLessonUsers = new QLabel("Available\nteacher\nlogins");
     f_LvAddLessonUsers = new QListView(this);
+    f_LvAddLessonUsers->setSelectionMode(QAbstractItemView::SingleSelection);
     QLabel *LblAddLessonGroups = new QLabel("Available\ngroup\nindexes");
     f_LvAddLessonGroups = new QListView(this);
+    f_LvAddLessonGroups->setSelectionMode(QAbstractItemView::SingleSelection);
+    QLabel *LblAddLessonSubj = new QLabel("Available\nsubject\nnames");
+    f_LvAddLessonSubj = new QListView(this);
+    f_LvAddLessonSubj->setSelectionMode(QAbstractItemView::SingleSelection);
     QLabel *LblLessAmout = new QLabel("Amount of lessons\nduring semestre:");
     f_LessonsAmount = new QSpinBox(this);
     f_LessonsAmount->setMinimum(1);
@@ -167,7 +173,10 @@ AdminMenu::AdminMenu(QWidget *parent)
 
     f_BtnAcceptLesson = new QPushButton("Accept info");
 
+
     f_LytAddLesson->addWidget(LblAddLess,0,0,1,2,Qt::AlignmentFlag::AlignCenter);
+    f_LytAddLesson->addWidget(LblAddLessonSubj,1,0,Qt::AlignmentFlag::AlignLeft);
+    f_LytAddLesson->addWidget(f_LvAddLessonSubj,1,1,Qt::AlignmentFlag::AlignRight);
     f_LytAddLesson->addWidget(LblAddLessonUsers,2,0,Qt::AlignmentFlag::AlignCenter);
     f_LytAddLesson->addWidget(LblAddLessonGroups,2,1,Qt::AlignmentFlag::AlignCenter);
     f_LytAddLesson->addWidget(f_LvAddLessonUsers,3,0,Qt::AlignmentFlag::AlignCenter);
@@ -196,6 +205,7 @@ AdminMenu::AdminMenu(QWidget *parent)
     f_TvAtt = new QTableView();
     QLabel *LblAttGroup = new QLabel("Available\ngroup\nindexes");
     f_Groups = new QListView();
+    f_Groups->setSelectionMode(QAbstractItemView::SingleSelection);
 
     QLabel *LblAttDay = new QLabel("Day:");
     f_Days = new QComboBox(this);
@@ -360,6 +370,7 @@ void AdminMenu::onNewLessonClicked()
     QSqlQueryModel* model = GeneralDAO::getInstance().getAllGroupIds();
     f_LvAddLessonGroups->setModel(model);
     f_LvAddLessonUsers->setModel(GeneralDAO::getInstance().getAllTeacherLogins());
+    f_LvAddLessonSubj->setModel(GeneralDAO::getInstance().getAllSubjects());
     f_WidMenu->hide();
     f_WidAddLesson->show();
     f_BtnBackToMenu->show();
@@ -464,14 +475,20 @@ void AdminMenu::onAcceptLessInfoClicked()
     }
     else
     {
-        if(f_LvAddLessonUsers->selectionModel() == nullptr || f_LvAddLessonGroups->selectionModel() == nullptr)
+        if(f_LvAddLessonUsers->selectionModel() == nullptr
+                || f_LvAddLessonGroups->selectionModel() == nullptr
+                || f_LvAddLessonSubj->selectionModel() == nullptr
+                )
         {
             f_LblErr->show();
             return;
         }
         else
         {
-            if(f_LvAddLessonUsers->selectionModel()->selectedRows().size() == 0 || f_LvAddLessonGroups->selectionModel()->selectedRows().size() == 0)
+            if(f_LvAddLessonUsers->selectionModel()->selectedRows().size() == 0
+                    || f_LvAddLessonGroups->selectionModel()->selectedRows().size() == 0
+                    || f_LvAddLessonSubj->selectionModel()->selectedRows().size() == 0
+                    )
             {
                 f_LblErr->show();
                 return;
@@ -483,8 +500,8 @@ void AdminMenu::onAcceptLessInfoClicked()
 
         less.setAmount(f_LessonsAmount->value());
         less.setGroup(f_LvAddLessonGroups->model()->data(f_LvAddLessonGroups->selectionModel()->selectedIndexes().at(0)).toString());
-        less.setLessonTime(f_AddLessonDay->currentData().toString() + " " + f_AddLessonTime->currentData().toString());
-        less.setName(" AA ");           ///!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+        less.setLessonTime(f_AddLessonDay->currentText() + " " + f_AddLessonTime->currentText());
+        less.setName(f_LvAddLessonSubj->model()->data(f_LvAddLessonSubj->selectionModel()->selectedIndexes().at(0)).toString());           ///!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
         less.setTeacher(f_LvAddLessonUsers->model()->data(f_LvAddLessonUsers->selectionModel()->selectedIndexes().at(0)).toString());
 
         GeneralDAO::getInstance().addLesson(less);

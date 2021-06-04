@@ -59,6 +59,7 @@ private:
     //add lesson wid
     QWidget *f_WidAddLesson;
     QGridLayout *f_LytAddLesson;
+    QListView* f_LvAddLessonSubj;
     QListView *f_LvAddLessonUsers;
     QListView *f_LvAddLessonGroups;
     QSpinBox *f_LessonsAmount;

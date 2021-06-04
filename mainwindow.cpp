@@ -254,12 +254,12 @@ void MainWindow::onLoginBtnClicked()
 
     f_LblWrong->hide();
 
-    if(/*option ==*/ 0  /*Valid login*/)
+    if(option == 0  /*Valid login*/)
     {
         emit sigLoginAcceptedUser();
         f_LePass->clear();
     }
-    else if(/*option ==*/ 1 /*admin login*/)
+    else if(option == 1 /*admin login*/)
     {
         emit sigLoginAcceptedAdmin();
         f_LePass->clear();

@@ -11,7 +11,7 @@ GeneralDAO &GeneralDAO::getInstance()
 
 Student *GeneralDAO::getStudentByStudnum(QString studnum)
 {
-    QSqlQueryModel* queryModel = new QSqlQueryModel(this);
+    QSqlQueryModel* queryModel = new QSqlQueryModel;
 
     Student* student = new Student();
 
@@ -29,7 +29,7 @@ Student *GeneralDAO::getStudentByStudnum(QString studnum)
 
 Lesson *GeneralDAO::getLessonByGroupAndTime(QString group, QString time)
 {
-    QSqlQueryModel* queryModel = new QSqlQueryModel(this);
+    QSqlQueryModel* queryModel = new QSqlQueryModel;
 
     Lesson* lesson = new Lesson();
     queryModel->setQuery("SELECT * FROM DI_LESSONS WHERE (gruppa = '" + group +"' AND lesson_time='" + time + "');");
@@ -54,21 +54,23 @@ void GeneralDAO::doSetVisit(QString studNum, int lessonId)
 {
     QDate currentDate = QDate::currentDate();
 
-    QString query = "INSERT INTO DI_VISITINGS VALUES ("
+    QString query = "INSERT INTO di_visitings VALUES ("
         + QString::number(lessonId) + ","
         + "'" + studNum + "',"
         + "'" + currentDate.toString("yyyy-MM-dd") + "');";
+    QSqlQueryModel* queryModel = new QSqlQueryModel;
+    queryModel->setQuery(query);
     qDebug() << query;
 }
 
 int GeneralDAO::validateLoginPass(const QString &login, const QString &pass)
 {
-    QSqlQueryModel* queryModel = new QSqlQueryModel(this);
+    QSqlQueryModel* queryModel = new QSqlQueryModel;
 
     queryModel->setQuery("SELECT is_admin FROM di_users WHERE login = '"+ login +"' AND password = '"+pass+"';");
     /*model->lastError().type() != QSqlError::NoError*/
-
-    if(queryModel != nullptr && queryModel->lastError().type() == QSqlError::NoError)
+    qDebug() << queryModel->rowCount();
+    if(queryModel != nullptr && queryModel->lastError().type() == QSqlError::NoError && queryModel->rowCount() != 0)
     {
         QString* what_kind_of_user = new QString(queryModel->index(0,0).data().toString());
         if(*what_kind_of_user == "true")
@@ -88,7 +90,7 @@ int GeneralDAO::validateLoginPass(const QString &login, const QString &pass)
 
 QSqlQueryModel *GeneralDAO::getGroupsByLogin(const QString &login)
 {
-    QSqlQueryModel* queryModel = new QSqlQueryModel(this);
+    QSqlQueryModel* queryModel = new QSqlQueryModel;
 
     queryModel->setQuery("SELECT gruppa FROM di_lessons WHERE teacher = '"+ login +"';");
     return  queryModel;
@@ -96,7 +98,7 @@ QSqlQueryModel *GeneralDAO::getGroupsByLogin(const QString &login)
 
 int GeneralDAO::getLessonIdByPK(const QString &group, const QString &time)
 {
-    QSqlQueryModel* queryModel = new QSqlQueryModel(this);
+    QSqlQueryModel* queryModel = new QSqlQueryModel;
 
 
     queryModel->setQuery("SELECT id FROM di_lessons WHERE gruppa = '"+ group +"' AND lesson_time = '"+time+"';");
@@ -113,7 +115,7 @@ int GeneralDAO::getLessonIdByPK(const QString &group, const QString &time)
 
 bool GeneralDAO::addStudent(const Student &student)
 {
-    QSqlQueryModel* queryModel = new QSqlQueryModel(this);
+    QSqlQueryModel* queryModel = new QSqlQueryModel;
 
 
     queryModel->setQuery("INSERT INTO di_students VALUES ('"+student.getStudNum()+"','"+student.getName()+"','"+student.getGroup()+"');");
@@ -129,7 +131,7 @@ bool GeneralDAO::addStudent(const Student &student)
 
 bool GeneralDAO::addGroup(const QString &groupId)
 {
-    QSqlQueryModel* queryModel = new QSqlQueryModel(this);
+    QSqlQueryModel* queryModel = new QSqlQueryModel;
 
 
     queryModel->setQuery("INSERT INTO di_grupps VALUES ('"+groupId+"');");
@@ -145,17 +147,15 @@ bool GeneralDAO::addGroup(const QString &groupId)
 
 bool GeneralDAO::addLesson(const Lesson &lesson)
 {
-    QSqlQueryModel* queryModel = new QSqlQueryModel(this);
+    QSqlQueryModel* queryModel = new QSqlQueryModel;
 
-    queryModel->setQuery("INSERT INTO di_lessons VALUES ('"
+    queryModel->setQuery("INSERT INTO di_lessons(naming, lesson_time, gruppa, number, teacher) VALUES ('"
                         +lesson.getName()
                         +"','"
                         +lesson.getLessonTime()
                         +"','"
                         +lesson.getGroup()
                         +"','"
-                        /*+QString::number(lesson.getId())
-                        +"','"*/
                         +QString::number(lesson.getAmount())
                         +"','"
                         +lesson.getTeacher()+"');"
@@ -173,7 +173,7 @@ bool GeneralDAO::addLesson(const Lesson &lesson)
 
 bool GeneralDAO::addSubject(const QString &subjectName)
 {
-    QSqlQueryModel* queryModel = new QSqlQueryModel(this);
+    QSqlQueryModel* queryModel = new QSqlQueryModel;
 
     queryModel->setQuery("INSERT INTO di_subject VALUES ('"+subjectName+"');");
     if(queryModel == nullptr)
@@ -188,7 +188,7 @@ bool GeneralDAO::addSubject(const QString &subjectName)
 
 QSqlQueryModel *GeneralDAO::getAllTeacherLogins()
 {
-    QSqlQueryModel* queryModel = new QSqlQueryModel(this);
+    QSqlQueryModel* queryModel = new QSqlQueryModel;
 
     queryModel->setQuery("SELECT login FROM di_users WHERE is_admin = 'false';");
     return  queryModel;
@@ -196,7 +196,7 @@ QSqlQueryModel *GeneralDAO::getAllTeacherLogins()
 
 QSqlQueryModel *GeneralDAO::getAllGroupIds()
 {
-    QSqlQueryModel* queryModel = new QSqlQueryModel(this);
+    QSqlQueryModel* queryModel = new QSqlQueryModel;
 
     queryModel->setQuery("SELECT grupp_num FROM di_grupps;");
     return  queryModel;
@@ -204,7 +204,7 @@ QSqlQueryModel *GeneralDAO::getAllGroupIds()
 
 QSqlQueryModel *GeneralDAO::getVisitingsByGroupTime(const QString &group, const QString &time)
 {
-    QSqlQueryModel* queryModel = new QSqlQueryModel(this);
+    QSqlQueryModel* queryModel = new QSqlQueryModel;
 
     queryModel->setQuery("SELECT lesson_id, student_id, visit_time FROM  di_lessons INNER JOIN di_visitings  ON di_lessons.id = di_visitings.lesson_id  WHERE gruppa = '"+group+"' AND lesson_time = '"+time+"';");
     return queryModel;
@@ -212,9 +212,17 @@ QSqlQueryModel *GeneralDAO::getVisitingsByGroupTime(const QString &group, const 
 
 QSqlQueryModel *GeneralDAO::getTimesByLoginGroup(const QString &group, const QString &login)
 {
-    QSqlQueryModel* queryModel = new QSqlQueryModel(this);
+    QSqlQueryModel* queryModel = new QSqlQueryModel;
 
     queryModel->setQuery("SELECT lesson_time FROM di_lessons WHERE gruppa = '"+ group +"' AND teacher ='"+login+"';");
+    return  queryModel;
+}
+
+QSqlQueryModel *GeneralDAO::getAllSubjects()
+{
+    QSqlQueryModel* queryModel = new QSqlQueryModel;
+
+    queryModel->setQuery("SELECT * FROM di_subject;");
     return  queryModel;
 }
 
