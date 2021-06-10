@@ -43,12 +43,24 @@ public:
 
     QSqlQueryModel* getAllGroupIds();                       //Added
 
-    QSqlQueryModel* getVisitingsByGroupTime(const QString& group,
+    QSqlQueryModel* getVisitingsByGroupSubj(const QString& group,
                                             const QString& time);
 
     QSqlQueryModel* getTimesByLoginGroup(const QString& group,    // Added
                                          const QString& login);
     QSqlQueryModel* getAllSubjects();
+
+    QSqlQueryModel *getAllStudents();
+
+    QSqlQueryModel* getAllLessons();
+
+    QSqlError removeSubject(const QString& p_sbj);
+
+    QSqlError removeStudent(const QString& p_st);
+
+    QSqlError removeLesson(int p_id);
+
+    QSqlError removeGroup(const QString& p_gr);
 
 protected:
     GeneralDAO();

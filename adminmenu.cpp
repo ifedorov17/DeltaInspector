@@ -8,33 +8,39 @@ AdminMenu::AdminMenu(QWidget *parent)
 {
     f_LytMain = new QGridLayout(this);
 
-    f_BtnBackToMenu = new QPushButton("Back to menu", this);
+    f_BtnBackToMenu = new QPushButton("Меню", this);
     connect(f_BtnBackToMenu, SIGNAL(clicked()), this, SLOT(backToMenu()));
     f_LytMain->addWidget(f_BtnBackToMenu,0,0,Qt::AlignmentFlag::AlignLeft);
     f_BtnBackToMenu->hide();
 
-    f_LblErr = new QLabel("All the fields must be\nfilled or selected");
-    f_LblErr->setStyleSheet("QLabel { color : red; }");
+    f_LblErr = new QLabel("Все поля должны быть\nзаполнены или выбраны");
+    f_LblErr->setStyleSheet("QLabel { color : rgb(254,192,0); }");
 
-    f_LytMain->addWidget(f_LblErr,3,0,Qt::AlignmentFlag::AlignCenter);
+    f_LblDAOErr = new QLabel();
+    f_LblDAOErr->setStyleSheet("QLabel { color : rgb(255,60,60); }");
+
+    f_LytMain->addWidget(f_LblErr,7,0,Qt::AlignmentFlag::AlignCenter);
+    f_LytMain->addWidget(f_LblDAOErr,8,0,Qt::AlignmentFlag::AlignCenter);
+
     f_LblErr->hide();
+    f_LblDAOErr->hide();
 
     //menu lyt setup
     f_WidMenu = new QWidget(this);
-    f_LytMenu = new QGridLayout(this);
-    QLabel *LblMenu = new QLabel("Admin Menu", this);
-    f_BtnAddSubject = new QPushButton("Add new subject", this);
-    f_BtnAddGroup = new QPushButton("Add new group", this);
-    f_BtnAddLesson = new QPushButton("Add new lesson", this);
-    f_BtnAddStudent = new QPushButton("Add new student", this);
-    f_BtnAttCheck = new QPushButton("Attendance check", this);
-    f_BtnLogout = new QPushButton("Logout", this);
+    f_LytMenu = new QGridLayout();
+    QLabel *LblMenu = new QLabel("Меню администратора", this);
+    f_BtnManageSubject = new QPushButton("Управление предметами", this);
+    f_BtnManageGroup = new QPushButton("Управление группами", this);
+    f_BtnManageLesson = new QPushButton("Управление занятиями", this);
+    f_BtnManageStudent = new QPushButton("Управление студентами", this);
+    f_BtnAttCheck = new QPushButton("Проверка посещаемости", this);
+    f_BtnLogout = new QPushButton("Выход", this);
 
     f_LytMenu->addWidget(LblMenu,0,0,Qt::AlignmentFlag::AlignCenter);
-    f_LytMenu->addWidget(f_BtnAddSubject,2,0,Qt::AlignmentFlag::AlignCenter);
-    f_LytMenu->addWidget(f_BtnAddGroup,3,0,Qt::AlignmentFlag::AlignCenter);
-    f_LytMenu->addWidget(f_BtnAddLesson,4,0,Qt::AlignmentFlag::AlignCenter);
-    f_LytMenu->addWidget(f_BtnAddStudent,5,0,Qt::AlignmentFlag::AlignCenter);
+    f_LytMenu->addWidget(f_BtnManageSubject,2,0,Qt::AlignmentFlag::AlignCenter);
+    f_LytMenu->addWidget(f_BtnManageGroup,3,0,Qt::AlignmentFlag::AlignCenter);
+    f_LytMenu->addWidget(f_BtnManageLesson,4,0,Qt::AlignmentFlag::AlignCenter);
+    f_LytMenu->addWidget(f_BtnManageStudent,5,0,Qt::AlignmentFlag::AlignCenter);
     f_LytMenu->addWidget(f_BtnAttCheck,6,0,Qt::AlignmentFlag::AlignCenter);
     f_LytMenu->addWidget(f_BtnLogout,7,0,Qt::AlignmentFlag::AlignCenter);
 
@@ -42,125 +48,203 @@ AdminMenu::AdminMenu(QWidget *parent)
 
     f_LytMain->addWidget(f_WidMenu,1,0,Qt::AlignmentFlag::AlignCenter);
 
-    connect(f_BtnAddSubject, SIGNAL(clicked()), this, SLOT(onNewSubjectClicked()));
-    connect(f_BtnAddGroup, SIGNAL(clicked()), this, SLOT(onNewGroupClicked()));
-    connect(f_BtnAddLesson, SIGNAL(clicked()), this, SLOT(onNewLessonClicked()));
-    connect(f_BtnAddStudent, SIGNAL(clicked()), this, SLOT(onNewStudentClicked()));
+    connect(f_BtnManageSubject, SIGNAL(clicked()), this, SLOT(onNewSubjectClicked()));
+    connect(f_BtnManageGroup, SIGNAL(clicked()), this, SLOT(onNewGroupClicked()));
+    connect(f_BtnManageLesson, SIGNAL(clicked()), this, SLOT(onNewLessonClicked()));
+    connect(f_BtnManageStudent, SIGNAL(clicked()), this, SLOT(onNewStudentClicked()));
     connect(f_BtnAttCheck, SIGNAL(clicked()), this, SLOT(onAttCheckClicked()));
     connect(f_BtnLogout, SIGNAL(clicked()), this, SLOT(onLogoutClicked()));
     //
 
     //add student wid
+
     f_WidAddStudent = new QWidget(this);
-    f_LytAddStudent = new QGridLayout(this);
-    QLabel *LblAddStudent = new QLabel("Add new student");
+    f_LytAddStudent = new QGridLayout();
+    QLabel *LblAddStudent = new QLabel("Управление студентами");
+
+    f_AllStudents = new QTableView();
+    f_AllStudents->setSelectionBehavior(QAbstractItemView::SelectRows);
+    f_AllStudents->setSelectionMode(QAbstractItemView::SingleSelection);
+
+    QLabel *LblStEd = new QLabel("Добавление студента");
+
     f_LeStName = new QLineEdit(this);
-    f_LvStGroup = new QListView(this);
+    f_LvStGroup = new QListView();
     f_LvStGroup->setSelectionMode(QAbstractItemView::SingleSelection);
+
     f_LeStudNum = new QLineEdit(this);
+
     f_eMail = new QLineEdit(this);
-    f_BtnAcceptStudent = new QPushButton("Accept info",this);
 
-    QLabel *LblStName = new QLabel("Name:");
-    QLabel *LblStGroup = new QLabel("Group:");
-    QLabel *LblStStudNum = new QLabel("Auth. number:");
-    QLabel *LblStMail = new QLabel("Email:");
+    f_BtnAcceptStudent = new QPushButton("+", this);
+    f_BtnRemoveStudent = new QPushButton("-", this);
+    f_BtnAcceptStudent->setMinimumSize(30,30);
+    f_BtnRemoveStudent->setMinimumSize(30,30);
 
-    f_LytAddStudent->addWidget(LblAddStudent,0,0,1,2,Qt::AlignmentFlag::AlignCenter);
+    QLabel *LblStName = new QLabel("Имя:", this);
+    QLabel *LblStGroup = new QLabel("Группа:", this);
+    QLabel *LblStStudNum = new QLabel("Номер СБ:", this);
+    QLabel *LblStMail = new QLabel("Эл. почта:", this);
 
-    f_LytAddStudent->addWidget(LblStName,2,0,Qt::AlignmentFlag::AlignRight);
-    f_LytAddStudent->addWidget(f_LeStName,2,1,Qt::AlignmentFlag::AlignCenter);
+    f_LytAddStudent->addWidget(LblAddStudent,0,0,Qt::AlignmentFlag::AlignCenter);
+    f_LytAddStudent->addWidget(f_BtnRemoveStudent,0,1,Qt::AlignmentFlag::AlignRight);
 
-    f_LytAddStudent->addWidget(LblStGroup,3,0,Qt::AlignmentFlag::AlignRight);
-    f_LytAddStudent->addWidget(f_LvStGroup,3,1,Qt::AlignmentFlag::AlignCenter);
+    f_LytAddStudent->addWidget(f_AllStudents,1,0,1,2,Qt::AlignmentFlag::AlignCenter);
 
-    f_LytAddStudent->addWidget(LblStStudNum,4,0,Qt::AlignmentFlag::AlignRight);
-    f_LytAddStudent->addWidget(f_LeStudNum,4,1,Qt::AlignmentFlag::AlignCenter);
+    f_LytAddStudent->addWidget(LblStEd,2,0,1,2,Qt::AlignmentFlag::AlignCenter);
 
-    f_LytAddStudent->addWidget(LblStMail,5,0,Qt::AlignmentFlag::AlignRight);
-    f_LytAddStudent->addWidget(f_eMail,5,1,Qt::AlignmentFlag::AlignCenter);
+    f_LytAddStudent->addWidget(LblStName,3,0,Qt::AlignmentFlag::AlignRight);
+    f_LytAddStudent->addWidget(f_LeStName,3,1,Qt::AlignmentFlag::AlignCenter);
 
-    f_LytAddStudent->addWidget(f_BtnAcceptStudent,6,0,1,2,Qt::AlignmentFlag::AlignCenter);
+    f_LytAddStudent->addWidget(LblStGroup,4,0,Qt::AlignmentFlag::AlignRight);
+    f_LytAddStudent->addWidget(f_LvStGroup,4,1,Qt::AlignmentFlag::AlignCenter);
 
-    f_LytMain->addWidget(f_WidAddStudent,1,0,Qt::AlignmentFlag::AlignCenter);
+    f_LytAddStudent->addWidget(LblStStudNum,5,0,Qt::AlignmentFlag::AlignRight);
+    f_LytAddStudent->addWidget(f_LeStudNum,5,1,Qt::AlignmentFlag::AlignCenter);
+
+    f_LytAddStudent->addWidget(LblStMail,6,0,Qt::AlignmentFlag::AlignRight);
+    f_LytAddStudent->addWidget(f_eMail,6,1,Qt::AlignmentFlag::AlignCenter);
+
+    f_LytAddStudent->addWidget(f_BtnAcceptStudent,7,0,1,2,Qt::AlignmentFlag::AlignCenter);
 
     f_WidAddStudent->setLayout(f_LytAddStudent);
     f_WidAddStudent->hide();
 
+    f_LytMain->addWidget(f_WidAddStudent,2,0,Qt::AlignmentFlag::AlignCenter);
+
     connect(f_BtnAcceptStudent, SIGNAL(clicked()), this, SLOT(onAcceptStInfoClicked()));
-    //
+    connect(f_BtnRemoveStudent, SIGNAL(clicked()), this, SLOT(onRemoveSt()));
+
+   //
 
     //add group wid
     f_WidAddGroup = new QWidget(this);
-    f_LytAddGroup = new QGridLayout(this);
-    QLabel *LblAddGroup = new QLabel("Add new group");
-    f_BtnAcceptGroup = new QPushButton("Accept info",this);
-    QLabel *LblLeGroup = new QLabel("Group index:");
+    f_LytAddGroup = new QGridLayout();
+
+    QLabel *LblAddGroup = new QLabel("Управление группами", this);
+
+    f_AllGroups = new QListView();
+    f_AllGroups->setSelectionMode(QAbstractItemView::SingleSelection);
+
+    QLabel *LblGrEd = new QLabel("Добавление группы");
+
+    f_BtnAcceptGroup = new QPushButton("+", this);
+    f_BtnRemoveGroup = new QPushButton("-", this);
+
+    f_BtnAcceptGroup->setMinimumSize(30,30);
+    f_BtnRemoveGroup->setMinimumSize(30,30);
+
+    QLabel *LblLeGroup = new QLabel("Номер группы:", this);
     f_LeGroup = new QLineEdit(this);
 
-    f_LytAddGroup->addWidget(LblAddGroup,0,0,1,2,Qt::AlignmentFlag::AlignCenter);
-    f_LytAddGroup->addWidget(LblLeGroup,2,0,Qt::AlignmentFlag::AlignRight);
-    f_LytAddGroup->addWidget(f_LeGroup,2,1,Qt::AlignmentFlag::AlignCenter);
-    f_LytAddGroup->addWidget(f_BtnAcceptGroup,3,0,1,2,Qt::AlignmentFlag::AlignCenter);
+    f_LytAddGroup->addWidget(LblAddGroup,0,0,Qt::AlignmentFlag::AlignCenter);
+    f_LytAddGroup->addWidget(f_BtnRemoveGroup,0,1,Qt::AlignmentFlag::AlignCenter);
+
+    f_LytAddGroup->addWidget(f_AllGroups,1,0,1,2,Qt::AlignmentFlag::AlignCenter);
+
+    f_LytAddGroup->addWidget(LblGrEd,2,0,1,2,Qt::AlignmentFlag::AlignCenter);
+
+    f_LytAddGroup->addWidget(LblLeGroup,3,0,Qt::AlignmentFlag::AlignRight);
+    f_LytAddGroup->addWidget(f_LeGroup,3,1,Qt::AlignmentFlag::AlignCenter);
+
+    f_LytAddGroup->addWidget(f_BtnAcceptGroup,4,0,1,2,Qt::AlignmentFlag::AlignCenter);
 
     f_WidAddGroup->setLayout(f_LytAddGroup);
-    f_LytMain->addWidget(f_WidAddGroup,1,0,Qt::AlignmentFlag::AlignCenter);
+    f_LytMain->addWidget(f_WidAddGroup,3,0,Qt::AlignmentFlag::AlignCenter);
 
     f_WidAddGroup->hide();
 
     connect(f_BtnAcceptGroup, SIGNAL(clicked()), this, SLOT(onAcceptGrInfoClicked()));
+    connect(f_BtnRemoveGroup, SIGNAL(clicked()), this, SLOT(onRemoveGr()));
     //
 
     //add subject wid
     f_WidAddSubject = new QWidget(this);
-    f_LytAddSubject = new QGridLayout(this);
-    QLabel *LblAddSubj = new QLabel("Add new subject");
-    f_BtnAcceptSubject = new QPushButton("Accept info",this);
-    QLabel *LblLeSubject = new QLabel("Subject name:");
+    f_LytAddSubject = new QGridLayout();
+
+    QLabel *LblAddSubj = new QLabel("Управление предметами", this);
+
+    f_AllSubjects = new QListView();
+    f_AllSubjects->setSelectionMode(QAbstractItemView::SingleSelection);
+
+    QLabel *LblSubEd = new QLabel("Добавление предмета");
+
+    f_BtnAcceptSubject = new QPushButton("+", this);
+    f_BtnRemoveSubject = new QPushButton("-", this);
+    f_BtnAcceptSubject->setMinimumSize(30,30);
+    f_BtnRemoveSubject->setMinimumSize(30,30);
+
+
+    QLabel *LblLeSubject = new QLabel("Название предмета:", this);
     f_LeSubject = new QLineEdit(this);
 
-    f_LytAddSubject->addWidget(LblAddSubj,0,0,1,2,Qt::AlignmentFlag::AlignCenter);
-    f_LytAddSubject->addWidget(LblLeSubject,2,0,Qt::AlignmentFlag::AlignRight);
-    f_LytAddSubject->addWidget(f_LeSubject,2,1,Qt::AlignmentFlag::AlignCenter);
-    f_LytAddSubject->addWidget(f_BtnAcceptSubject,3,0,1,2,Qt::AlignmentFlag::AlignCenter);
+    f_LytAddSubject->addWidget(LblAddSubj,0,0,Qt::AlignmentFlag::AlignCenter);
+    f_LytAddSubject->addWidget(f_BtnRemoveSubject,0,1,Qt::AlignmentFlag::AlignCenter);
+
+    f_LytAddSubject->addWidget(f_AllSubjects,1,0,1,2,Qt::AlignmentFlag::AlignCenter);
+
+    f_LytAddSubject->addWidget(LblSubEd,2,0,1,2,Qt::AlignmentFlag::AlignCenter);
+
+    f_LytAddSubject->addWidget(LblLeSubject,3,0,Qt::AlignmentFlag::AlignRight);
+    f_LytAddSubject->addWidget(f_LeSubject,3,1,Qt::AlignmentFlag::AlignCenter);
+
+    f_LytAddSubject->addWidget(f_BtnAcceptSubject,4,0,1,2,Qt::AlignmentFlag::AlignCenter);
+
 
     f_WidAddSubject->setLayout(f_LytAddSubject);
-    f_LytMain->addWidget(f_WidAddSubject,1,0,Qt::AlignmentFlag::AlignCenter);
+    f_LytMain->addWidget(f_WidAddSubject,4,0,Qt::AlignmentFlag::AlignCenter);
 
     f_WidAddSubject->hide();
 
     connect(f_BtnAcceptSubject, SIGNAL(clicked()), this, SLOT(onAcceptSubjInfoClicked()));
+    connect(f_BtnRemoveSubject, SIGNAL(clicked()), this, SLOT(onRemoveSubj()));
     //
 
     //lesson wid
     f_WidAddLesson = new QWidget(this);
-    f_LytAddLesson = new QGridLayout(this);
-    QLabel *LblAddLess = new QLabel("Add new lesson");
-    f_BtnAcceptLesson = new QPushButton("Accept info");
-    QLabel *LblAddLessonUsers = new QLabel("Available\nteacher\nlogins");
-    f_LvAddLessonUsers = new QListView(this);
+    f_LytAddLesson = new QGridLayout();
+
+    QLabel *LblAddLess = new QLabel("Управление занятиями");
+
+    f_AllLessons = new QTableView();
+    f_AllLessons->setSelectionBehavior(QAbstractItemView::SelectRows);
+    f_AllLessons->setSelectionMode(QAbstractItemView::SingleSelection);
+
+    QLabel *LblLessEd = new QLabel("Добавление занятия");
+
+    f_BtnAcceptLesson = new QPushButton("+", this);
+    f_BtnRemoveLesson = new QPushButton("-", this);
+    f_BtnAcceptLesson->setMinimumSize(30,30);
+    f_BtnRemoveLesson->setMinimumSize(30,30);
+
+    QLabel *LblAddLessonUsers = new QLabel("Доступные\nлогины\nпреподавателей", this);
+    f_LvAddLessonUsers = new QListView();
     f_LvAddLessonUsers->setSelectionMode(QAbstractItemView::SingleSelection);
-    QLabel *LblAddLessonGroups = new QLabel("Available\ngroup\nindexes");
-    f_LvAddLessonGroups = new QListView(this);
+
+    QLabel *LblAddLessonGroups = new QLabel("Доступные\nгруппы", this);
+    f_LvAddLessonGroups = new QListView();
     f_LvAddLessonGroups->setSelectionMode(QAbstractItemView::SingleSelection);
-    QLabel *LblAddLessonSubj = new QLabel("Available\nsubject\nnames");
-    f_LvAddLessonSubj = new QListView(this);
+
+    QLabel *LblAddLessonSubj = new QLabel("Доступные\nпредметы", this);
+    f_LvAddLessonSubj = new QListView();
     f_LvAddLessonSubj->setSelectionMode(QAbstractItemView::SingleSelection);
-    QLabel *LblLessAmout = new QLabel("Amount of lessons\nduring semestre:");
+
+    QLabel *LblLessAmout = new QLabel("Количество занятий\nв семестре:", this);
     f_LessonsAmount = new QSpinBox(this);
     f_LessonsAmount->setMinimum(1);
     f_LessonsAmount->setMaximum(100);
-    QLabel *LblLessDay = new QLabel("Day:");
+
+    QLabel *LblLessDay = new QLabel("День:", this);
     f_AddLessonDay = new QComboBox(this);
 
-    f_AddLessonDay->addItem("Mon");
-    f_AddLessonDay->addItem("Tue");
-    f_AddLessonDay->addItem("Wen");
-    f_AddLessonDay->addItem("Thu");
-    f_AddLessonDay->addItem("Fri");
-    f_AddLessonDay->addItem("Sat");
+    f_AddLessonDay->addItem("Пн");
+    f_AddLessonDay->addItem("Вт");
+    f_AddLessonDay->addItem("Ср");
+    f_AddLessonDay->addItem("Чт");
+    f_AddLessonDay->addItem("Пт");
+    f_AddLessonDay->addItem("Вс");
 
-    QLabel *LblLessTime = new QLabel("Time:");
+    QLabel *LblLessTime = new QLabel("Начало:", this);
     f_AddLessonTime = new QComboBox(this);
 
     f_AddLessonTime->addItem("8:30");
@@ -171,82 +255,80 @@ AdminMenu::AdminMenu(QWidget *parent)
     f_AddLessonTime->addItem("17:25");
     f_AddLessonTime->addItem("19:10");
 
-    f_BtnAcceptLesson = new QPushButton("Accept info");
+    f_LytAddLesson->addWidget(LblAddLess,0,0,Qt::AlignmentFlag::AlignCenter);
+    f_LytAddLesson->addWidget(f_BtnRemoveLesson,0,1,Qt::AlignmentFlag::AlignRight);
 
+    f_LytAddLesson->addWidget(f_AllLessons,1,0,1,2,Qt::AlignmentFlag::AlignCenter);
 
-    f_LytAddLesson->addWidget(LblAddLess,0,0,1,2,Qt::AlignmentFlag::AlignCenter);
-    f_LytAddLesson->addWidget(LblAddLessonSubj,1,0,Qt::AlignmentFlag::AlignLeft);
-    f_LytAddLesson->addWidget(f_LvAddLessonSubj,1,1,Qt::AlignmentFlag::AlignRight);
-    f_LytAddLesson->addWidget(LblAddLessonUsers,2,0,Qt::AlignmentFlag::AlignCenter);
-    f_LytAddLesson->addWidget(LblAddLessonGroups,2,1,Qt::AlignmentFlag::AlignCenter);
-    f_LytAddLesson->addWidget(f_LvAddLessonUsers,3,0,Qt::AlignmentFlag::AlignCenter);
-    f_LytAddLesson->addWidget(f_LvAddLessonGroups,3,1,Qt::AlignmentFlag::AlignCenter);
-    f_LytAddLesson->addWidget(LblLessAmout,4,0,Qt::AlignmentFlag::AlignRight);
-    f_LytAddLesson->addWidget(f_LessonsAmount,4,1,Qt::AlignmentFlag::AlignCenter);
-    f_LytAddLesson->addWidget(LblLessDay,5,0,Qt::AlignmentFlag::AlignRight);
-    f_LytAddLesson->addWidget(f_AddLessonDay,5,1,Qt::AlignmentFlag::AlignCenter);
-    f_LytAddLesson->addWidget(LblLessTime,6,0,Qt::AlignmentFlag::AlignRight);
-    f_LytAddLesson->addWidget(f_AddLessonTime,6,1,Qt::AlignmentFlag::AlignCenter);
-    f_LytAddLesson->addWidget(f_BtnAcceptLesson,7,0,1,2,Qt::AlignmentFlag::AlignCenter);
+    f_LytAddLesson->addWidget(LblLessEd,2,0,1,2,Qt::AlignmentFlag::AlignCenter);
+
+    f_LytAddLesson->addWidget(LblAddLessonSubj,3,0,Qt::AlignmentFlag::AlignLeft);
+    f_LytAddLesson->addWidget(f_LvAddLessonSubj,3,1,Qt::AlignmentFlag::AlignRight);
+
+    f_LytAddLesson->addWidget(LblAddLessonUsers,4,0,Qt::AlignmentFlag::AlignCenter);
+    f_LytAddLesson->addWidget(LblAddLessonGroups,4,1,Qt::AlignmentFlag::AlignCenter);
+
+    f_LytAddLesson->addWidget(f_LvAddLessonUsers,5,0,Qt::AlignmentFlag::AlignCenter);
+    f_LytAddLesson->addWidget(f_LvAddLessonGroups,5,1,Qt::AlignmentFlag::AlignCenter);
+
+    f_LytAddLesson->addWidget(LblLessAmout,6,0,Qt::AlignmentFlag::AlignRight);
+    f_LytAddLesson->addWidget(f_LessonsAmount,6,1,Qt::AlignmentFlag::AlignCenter);
+
+    f_LytAddLesson->addWidget(LblLessDay,7,0,Qt::AlignmentFlag::AlignRight);
+    f_LytAddLesson->addWidget(f_AddLessonDay,7,1,Qt::AlignmentFlag::AlignCenter);
+
+    f_LytAddLesson->addWidget(LblLessTime,8,0,Qt::AlignmentFlag::AlignRight);
+    f_LytAddLesson->addWidget(f_AddLessonTime,8,1,Qt::AlignmentFlag::AlignCenter);
+
+    f_LytAddLesson->addWidget(f_BtnAcceptLesson,9,0,1,2,Qt::AlignmentFlag::AlignRight);
+
 
     f_WidAddLesson->setLayout(f_LytAddLesson);
-    f_LytMain->addWidget(f_WidAddLesson,1,0,Qt::AlignmentFlag::AlignCenter);
+    f_LytMain->addWidget(f_WidAddLesson,5,0,Qt::AlignmentFlag::AlignCenter);
 
     f_WidAddLesson->hide();
 
     connect(f_BtnAcceptLesson, SIGNAL(clicked()), this, SLOT(onAcceptLessInfoClicked()));
+    connect(f_BtnRemoveLesson, SIGNAL(clicked()), this, SLOT(onRemoveLess()));
+
     //
 
     //att check wid
     f_WidAttCheck = new QWidget(this);
-    f_LytAttCheck = new QGridLayout(this);
-    f_BtnRefresh = new QPushButton("Refresh",this);
-    QLabel *LblAttCheck = new QLabel("Attandance check");
+    f_LytAttCheck = new QGridLayout();
+
+    f_BtnRefresh = new QPushButton("Обновить",this);
+
+    QLabel *LblAttCheck = new QLabel("Проверка посещаемости",this);
+
     f_TvAtt = new QTableView();
-    QLabel *LblAttGroup = new QLabel("Available\ngroup\nindexes");
+
+    QLabel *LblAttGroup = new QLabel("Доступные\nгруппы",this);
     f_Groups = new QListView();
     f_Groups->setSelectionMode(QAbstractItemView::SingleSelection);
 
-    QLabel *LblAttDay = new QLabel("Day:");
-    f_Days = new QComboBox(this);
-
-    f_Days->addItem("Mon");
-    f_Days->addItem("Tue");
-    f_Days->addItem("Wen");
-    f_Days->addItem("Thu");
-    f_Days->addItem("Fri");
-    f_Days->addItem("Sat");
-
-    QLabel *LblAttTimes = new QLabel("Time");
-    f_Times = new QComboBox(this);
-
-    f_Times->addItem("8:30");
-    f_Times->addItem("10:15");
-    f_Times->addItem("12:00");
-    f_Times->addItem("13:50");
-    f_Times->addItem("15:40");
-    f_Times->addItem("17:25");
-    f_Times->addItem("19:10");
+    QLabel *LblSub = new QLabel("Доступные\nпредметы",this);
+    f_Subjects = new QListView();
+    f_Subjects->setSelectionMode(QAbstractItemView::SingleSelection);
 
     f_LytAttCheck->addWidget(LblAttCheck,0,0,1,2,Qt::AlignmentFlag::AlignCenter);
-    f_LytAttCheck->addWidget(f_TvAtt,2,0,1,2,Qt::AlignmentFlag::AlignCenter);
-    f_LytAttCheck->addWidget(LblAttGroup,3,0,Qt::AlignmentFlag::AlignRight);
-    f_LytAttCheck->addWidget(f_Groups,3,1,Qt::AlignmentFlag::AlignCenter);
-    f_LytAttCheck->addWidget(LblAttDay,4,0,Qt::AlignmentFlag::AlignRight);
-    f_LytAttCheck->addWidget(f_Days,4,1,Qt::AlignmentFlag::AlignCenter);
-    f_LytAttCheck->addWidget(LblAttTimes,5,0,Qt::AlignmentFlag::AlignRight);
-    f_LytAttCheck->addWidget(f_Times,5,1,Qt::AlignmentFlag::AlignCenter);
-    f_LytAttCheck->addWidget(f_BtnRefresh,6,1,1,2,Qt::AlignmentFlag::AlignCenter);
+    f_LytAttCheck->addWidget(f_TvAtt,1,0,1,2,Qt::AlignmentFlag::AlignCenter);
+
+    f_LytAttCheck->addWidget(LblAttGroup,2,0,Qt::AlignmentFlag::AlignRight);
+    f_LytAttCheck->addWidget(f_Groups,2,1,Qt::AlignmentFlag::AlignCenter);
+
+    f_LytAttCheck->addWidget(LblSub,3,0,Qt::AlignmentFlag::AlignCenter);
+    f_LytAttCheck->addWidget(f_Subjects,3,1,Qt::AlignmentFlag::AlignCenter);
+
+    f_LytAttCheck->addWidget(f_BtnRefresh,4,0,1,2,Qt::AlignmentFlag::AlignCenter);
 
     f_WidAttCheck->setLayout(f_LytAttCheck);
-    f_LytMain->addWidget(f_WidAttCheck,1,0,Qt::AlignmentFlag::AlignCenter);
+    f_LytMain->addWidget(f_WidAttCheck,6,0,Qt::AlignmentFlag::AlignCenter);
 
     f_WidAttCheck->hide();
 
-    //
-
-
     connect(f_BtnRefresh, SIGNAL(clicked()), this, SLOT(refreshAttData()));
+    //
 
     setLayout(f_LytMain);
 }
@@ -272,7 +354,7 @@ void AdminMenu::styling()
 "}"
 ""
 "QPushButton {"
-"background-color: rgb(25,25,25);"
+"background-color: rgb(15,15,15);"
 "border-width: 2px solid;"
 "border-radius: 4px;"
 "font: bold 12px;"
@@ -286,7 +368,7 @@ void AdminMenu::styling()
 ""
 "QListView {"
 "background-color: rgb(46,46,46);"
-"alternate-background-color: rgb(32,32,32);"
+"alternate-background-color: rgb(15,15,15);"
 "border: 2px solid rgb(56,56,56);"
 "color: rgb(150,150,150);"
 "}"
@@ -325,6 +407,7 @@ void AdminMenu::backToMenu()
 {
     f_BtnBackToMenu->hide();
     f_LblErr->hide();
+    f_LblDAOErr->hide();
     f_WidAddGroup->hide();
     f_WidAddLesson->hide();
     f_WidAddStudent->hide();
@@ -345,15 +428,21 @@ void AdminMenu::refreshAttData()
         return;
     }
 
-    QString tech1 = f_Groups->model()->data(f_Groups->selectionModel()->selectedIndexes().at(0)).toString();
-    f_TvAtt->setModel(GeneralDAO::getInstance().getVisitingsByGroupTime(tech1, f_Days->currentText() + " " + f_Times->currentText()));
-
-    //DAO access filling in the data fields e.g. Filling the TableView for attendance
+    f_TvAtt->setModel(GeneralDAO::getInstance().getVisitingsByGroupSubj(
+                f_Groups->model()->data(
+                    f_Groups->selectionModel()->selectedIndexes().at(0)).toString(),
+                f_Subjects->model()->data(
+                    f_Subjects->selectionModel()->selectedIndexes().at(0)).toString()
+                )
+                      );
 }
 
 void AdminMenu::onNewSubjectClicked()
 {
     f_WidMenu->hide();
+    f_AllSubjects->setModel(
+                GeneralDAO::getInstance().getAllSubjects()
+                );
     f_WidAddSubject->show();
     f_BtnBackToMenu->show();
 }
@@ -361,16 +450,27 @@ void AdminMenu::onNewSubjectClicked()
 void AdminMenu::onNewGroupClicked()
 {
     f_WidMenu->hide();
+    f_AllGroups->setModel(
+                GeneralDAO::getInstance().getAllGroupIds()
+                );
     f_WidAddGroup->show();
     f_BtnBackToMenu->show();
 }
 
 void AdminMenu::onNewLessonClicked()
 {
-    QSqlQueryModel* model = GeneralDAO::getInstance().getAllGroupIds();
-    f_LvAddLessonGroups->setModel(model);
-    f_LvAddLessonUsers->setModel(GeneralDAO::getInstance().getAllTeacherLogins());
-    f_LvAddLessonSubj->setModel(GeneralDAO::getInstance().getAllSubjects());
+    f_AllLessons->setModel(
+                GeneralDAO::getInstance().getAllLessons()
+                );
+    f_LvAddLessonGroups->setModel(
+                GeneralDAO::getInstance().getAllGroupIds()
+                );
+    f_LvAddLessonUsers->setModel(
+                GeneralDAO::getInstance().getAllTeacherLogins()
+                );
+    f_LvAddLessonSubj->setModel(
+                GeneralDAO::getInstance().getAllSubjects()
+                );
     f_WidMenu->hide();
     f_WidAddLesson->show();
     f_BtnBackToMenu->show();
@@ -378,8 +478,12 @@ void AdminMenu::onNewLessonClicked()
 
 void AdminMenu::onNewStudentClicked()
 {
-    QSqlQueryModel* model = GeneralDAO::getInstance().getAllGroupIds();
-    f_LvStGroup->setModel(model);
+    f_AllStudents->setModel(
+                GeneralDAO::getInstance().getAllStudents()
+                );
+    f_LvStGroup->setModel(
+                GeneralDAO::getInstance().getAllGroupIds()
+                );
     f_WidMenu->hide();
     f_WidAddStudent->show();
     f_BtnBackToMenu->show();
@@ -387,9 +491,13 @@ void AdminMenu::onNewStudentClicked()
 
 void AdminMenu::onAttCheckClicked()
 {
-    QSqlQueryModel* model = GeneralDAO::getInstance().getAllGroupIds();
-    f_Groups->setModel(model);
 
+    f_Groups->setModel(
+                GeneralDAO::getInstance().getAllGroupIds()
+                );
+    f_Subjects->setModel(
+                GeneralDAO::getInstance().getAllSubjects()
+                );
     f_WidMenu->hide();
     f_WidAttCheck->show();
     f_BtnBackToMenu->show();
@@ -550,5 +658,98 @@ void AdminMenu::onAcceptSubjInfoClicked()
         GeneralDAO::getInstance().addSubject(f_LeSubject->text());
         backToMenu();
     }
+}
+
+void AdminMenu::onRemoveSt()
+{
+    f_LblDAOErr->hide();
+    QSqlError err = GeneralDAO::getInstance().removeStudent(
+                f_AllStudents->model()->data(
+                    f_AllStudents->selectionModel()->selectedIndexes().at(0)).toString()
+                );
+
+    if(err.type() != QSqlError::NoError)
+    {
+        f_LblDAOErr->setText(err.text());
+        f_LblDAOErr->show();
+        return;
+    }
+
+    f_AllStudents->setModel(
+                GeneralDAO::getInstance().getAllStudents()
+                );
+
+}
+
+void AdminMenu::onRemoveGr()
+{
+    f_LblDAOErr->hide();
+    QSqlError err = GeneralDAO::getInstance().removeGroup(
+                f_AllGroups->model()->data(
+                    f_AllGroups->selectionModel()->selectedIndexes().at(0)).toString()
+                );
+    if(err.type() != QSqlError::NoError)
+    {
+        f_LblDAOErr->setText(err.text());
+        f_LblDAOErr->show();
+        return;
+    }
+
+    f_AllGroups->setModel(
+                GeneralDAO::getInstance().getAllGroupIds()
+                );
+}
+
+void AdminMenu::onRemoveLess()
+{
+
+    f_LblDAOErr->hide();
+    QSqlError err = GeneralDAO::getInstance().removeLesson(
+                GeneralDAO::getInstance().getLessonIdByPK(
+                    f_AllLessons->model()->data(
+                        f_AllLessons->selectionModel()->selectedIndexes().at(2)).toString()
+                    ,
+                    f_AllLessons->model()->data(
+                        f_AllLessons->selectionModel()->selectedIndexes().at(1)).toString()
+                    )
+                );
+    if(err.type() != QSqlError::NoError)
+    {
+        f_LblDAOErr->setText(err.text());
+        f_LblDAOErr->show();
+        return;
+    }
+
+    f_AllLessons->setModel(
+                GeneralDAO::getInstance().getAllLessons()
+                );
+    f_LvAddLessonGroups->setModel(
+                GeneralDAO::getInstance().getAllGroupIds()
+                );
+    f_LvAddLessonUsers->setModel(
+                GeneralDAO::getInstance().getAllTeacherLogins()
+                );
+    f_LvAddLessonSubj->setModel(
+                GeneralDAO::getInstance().getAllSubjects()
+                );
+}
+
+void AdminMenu::onRemoveSubj()
+{
+    f_LblDAOErr->hide();
+    QSqlError err = GeneralDAO::getInstance().removeSubject(
+                f_AllSubjects->model()->data(
+                    f_AllSubjects->selectionModel()->selectedIndexes().at(0)).toString()
+                );
+    if(err.type() != QSqlError::NoError)
+    {
+        f_LblDAOErr->setText(err.text());
+        f_LblDAOErr->show();
+        return;
+    }
+
+    f_AllSubjects->setModel(
+                GeneralDAO::getInstance().getAllSubjects()
+                );
 }
 
