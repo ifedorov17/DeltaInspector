@@ -1361,16 +1361,18 @@ void BitBuffer::appendBits(std::uint32_t val, int len) {
 void paintQR(QString text)
     {
 
-        QrCode qr = QrCode::encodeText(text.toUtf8().data(), QrCode::Ecc::HIGH);
-          qint32 sz = qr.getSize();
-          QImage im(sz,sz, QImage::Format_RGB32);
-            QRgb black = qRgb(  0,  0,  0);
-            QRgb white = qRgb(255,255,255);
-          for (int y = 0; y < sz; y++)
-            for (int x = 0; x < sz; x++)
-              im.setPixel(x,y,qr.getModule(x, y) ? black : white );
-          im.scaled(512,512,Qt::KeepAspectRatio,Qt::FastTransformation).save("QR.png", nullptr, -1);
-          //im.save("QR.png", nullptr, -1);
+    QrCode qr = QrCode::encodeText(text.toUtf8().data(), QrCode::Ecc::HIGH);
+              qint32 sz = qr.getSize();
+              QImage im(sz+4,sz+4, QImage::Format_RGB32);
+                QRgb black = qRgb(  0,  0,  0);
+                QRgb white = qRgb(255,255,255);
+                im.fill(white);
+              for (int y = 0; y < sz; y++)
+                for (int x = 0; x < sz; x++)
+                  im.setPixel(x+2,y+2,qr.getModule(x, y) ? black : white );
+
+              im.scaled(512,512,Qt::KeepAspectRatio,Qt::FastTransformation).save("QR.png", nullptr, -1);
+              //im.save("QR.png", nullptr, -1);
     }
 
 #endif // QRENCODER_H

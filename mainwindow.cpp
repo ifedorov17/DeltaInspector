@@ -19,14 +19,14 @@ MainWindow::MainWindow(QWidget *parent)
     f_WidLogin = new QWidget(this);
 
     f_LytLogin = new QGridLayout(this);
-    f_BtnLogin = new QPushButton("Login", this);
+    f_BtnLogin = new QPushButton("Войти", this);
     f_LeLogin = new QLineEdit(this);
     f_LePass = new QLineEdit(this);
     f_LePass->setEchoMode(QLineEdit::Password);
 
-    QLabel* LblLogin = new QLabel("Login:", this);
-    QLabel* LblPass = new QLabel("Password:", this);
-    f_LblWrong = new QLabel("Wrong login or password.", this);
+    QLabel* LblLogin = new QLabel("Логин:", this);
+    QLabel* LblPass = new QLabel("Пароль:", this);
+    f_LblWrong = new QLabel("Неправильный логин или пароль.", this);
     f_LblWrong->setStyleSheet("QLabel { color : red; }");
 
     f_LytLogin->addWidget(LblLogin,0,0,Qt::AlignmentFlag::AlignCenter);
@@ -51,22 +51,12 @@ MainWindow::MainWindow(QWidget *parent)
     //making layout groups
     f_WidGroups = new QWidget(this);
 
-    QStringList *tempGroupsSL = new QStringList;
-    tempGroupsSL->push_back("group1");
-    tempGroupsSL->push_back("group2");
-    tempGroupsSL->push_back("group3");
-
-    QStringListModel *tempGroupsSLM = new QStringListModel(this);
-    tempGroupsSLM->setStringList(*tempGroupsSL);
-
     f_LytGroups = new QGridLayout(this);
-    QLabel *LblGroups = new QLabel("Select a group");
+    QLabel *LblGroups = new QLabel("Выберите группу");
     f_LvGroups = new QListView(this);
 
-    f_LvGroups->setModel(tempGroupsSLM);
-
     f_LvGroups->setSelectionMode(QAbstractItemView::SingleSelection);
-    f_BtnLogout = new QPushButton("Logout",this);
+    f_BtnLogout = new QPushButton("Выйти",this);
 
     f_LytGroups->addWidget(f_BtnLogout,0,0,Qt::AlignmentFlag::AlignLeft);
     f_LytGroups->addWidget(LblGroups,1,0,Qt::AlignmentFlag::AlignCenter);
@@ -85,22 +75,12 @@ MainWindow::MainWindow(QWidget *parent)
     f_WidTime = new QWidget(this);
     f_LytTime = new QGridLayout(this);
 
-    QStringList *tempTimesSL = new QStringList;
-    tempTimesSL->push_back("10");
-    tempTimesSL->push_back("12");
-    tempTimesSL->push_back("13");
-
-    QStringListModel *tempTimesSLM = new QStringListModel(this);
-    tempTimesSLM->setStringList(*tempTimesSL);
-
-    QLabel *LblTime = new QLabel("Select a time");
+    QLabel *LblTime = new QLabel("Выберите время");
     f_LvTimes = new QListView(this);
-
-    f_LvTimes->setModel(tempTimesSLM);
 
 
     f_LvTimes->setSelectionMode(QAbstractItemView::SingleSelection);
-    f_BtnBackToGroups = new QPushButton("Back");
+    f_BtnBackToGroups = new QPushButton("Назад");
 
     f_LytTime->addWidget(f_BtnBackToGroups,0,0,Qt::AlignmentFlag::AlignLeft);
     f_LytTime->addWidget(LblTime,1,0,Qt::AlignmentFlag::AlignCenter);
@@ -118,7 +98,7 @@ MainWindow::MainWindow(QWidget *parent)
     //making cam lyt;
     f_WidCam = new QWidget(this);
     f_LytCam = new QGridLayout(this);
-    f_BtnBackToSelections = new QPushButton("Back",this);
+    f_BtnBackToSelections = new QPushButton("Назад",this);
 
     connect(f_BtnBackToSelections, SIGNAL(clicked()), this, SLOT(onBackToSelections()));
 
@@ -141,8 +121,8 @@ MainWindow::MainWindow(QWidget *parent)
     //making verification lyt
     f_WidVer = new QWidget(this);
     f_LytVer = new QGridLayout(this);
-    f_BtnVerify = new QPushButton("Verify", this);
-    f_BtnDecline = new QPushButton("Decline", this);
+    f_BtnVerify = new QPushButton("Подтвердить посещение", this);
+    f_BtnDecline = new QPushButton("Отклонить посещение", this);
 
     connect(f_BtnVerify, SIGNAL(clicked()), this, SLOT(onVerified()));
     connect(f_BtnDecline, SIGNAL(clicked()), this, SLOT(onDeclined()));
@@ -195,7 +175,7 @@ void MainWindow::styling()
 "}"
 ""
 "QPushButton {"
-"background-color: rgb(25,25,25);"
+"background-color: rgb(15,15,15);"
 "border-width: 2px solid;"
 "border-radius: 4px;"
 "font: bold 12px;"
@@ -369,7 +349,6 @@ void MainWindow::onQueryError(const QString& p_Error)
 
 void MainWindow::onTagGot(QString tag)
 {
-    qDebug()<< "\n              !*!*!*!*!*!*!*!*!*!*!*!*!*!*!*!" << tag << "\n              !*!*!*!*!*!*!*!*!*!*!*!*!*!*!*!";
     f_WidCam->hide();
 
     f_StrDataRead = tag;
