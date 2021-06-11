@@ -245,7 +245,8 @@ QSqlQueryModel *GeneralDAO::getAllStudents()
 {
     QSqlQueryModel* queryModel = new QSqlQueryModel;
 
-    queryModel->setQuery("SELECT name AS Имя, gruppa AS Группа, stud_num AS Номер_СБ, FROM di_students;");
+
+    queryModel->setQuery("SELECT name AS Имя, gruppa AS Группа, stud_num AS Номер_СБ FROM di_students;");
     return  queryModel;
 }
 
@@ -253,7 +254,8 @@ QSqlQueryModel *GeneralDAO::getAllLessons()
 {
     QSqlQueryModel* queryModel = new QSqlQueryModel;
 
-    queryModel->setQuery("SELECT naming AS Предмет, lesson_time AS Время, gruppa AS Группа, number AS Количество, teacher AS Преподаватель, FROM di_lessons;");
+    queryModel->setQuery("SELECT naming AS Предмет, lesson_time AS Время, gruppa AS Группа, number AS Количество, teacher AS Преподаватель FROM di_lessons;");
+
     return  queryModel;
 }
 

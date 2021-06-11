@@ -328,7 +328,21 @@ AdminMenu::AdminMenu(QWidget *parent)
     f_WidAttCheck->hide();
 
     connect(f_BtnRefresh, SIGNAL(clicked()), this, SLOT(refreshAttData()));
-    //
+
+    f_LvAddLessonGroups->setMaximumSize(1000,1000);
+    f_LvAddLessonSubj->setMaximumSize(1000,1000);
+    f_LvAddLessonUsers->setMaximumSize(1000,1000);
+    f_LvStGroup->setMaximumSize(1000,1000);
+    f_TvAtt->setMaximumSize(1000,1000);
+    f_AllGroups->setMaximumSize(1000,1000);
+    f_AllLessons->setMaximumSize(1000,1000);
+    f_AllStudents->setMaximumSize(1000,1000);
+    f_AllSubjects->setMaximumSize(1000,1000);
+    f_LvAddLessonGroups->setMaximumSize(1000,1000);
+    f_LvAddLessonSubj->setMaximumSize(1000,1000);
+    f_LvAddLessonUsers->setMaximumSize(1000,1000);
+    f_Groups->setMaximumSize(1000,1000);
+    f_Subjects->setMaximumSize(1000,1000);
 
     setLayout(f_LytMain);
 }
@@ -559,10 +573,10 @@ void AdminMenu::onAcceptStInfoClicked()
 
                 message.setSender(new EmailAddress("deltainspectortech@gmail.com", "DeltaInspector"));
                 message.addRecipient(new EmailAddress(f_eMail->text(), f_LeStName->text()));
-                message.setSubject("Your registration qr code");
+                message.setSubject("Ваш регистрационный Qr код || DeltaInspector");
 
                 MimeText text;
-                text.setText("Greetings!\n This is Delta Inspetor Group.\nYour Qr registration code is attached!");
+                text.setText("Добрый день, " + f_LeStName->text() + "!\n\n   Вот ваш регистрационный Qr код для использования приложения DeltaInspector.\n\nС уважением, команда DeltaInspector.");
                 message.addPart(&text);
 
                 MimeAttachment attachment (new QFile("QR.png"));
@@ -573,7 +587,14 @@ void AdminMenu::onAcceptStInfoClicked()
                 smtp.sendMail(message);
                 smtp.quit();
 
-        backToMenu();
+                f_AllStudents->setModel(
+                            GeneralDAO::getInstance().getAllStudents()
+                            );
+                f_LvStGroup->setModel(
+                            GeneralDAO::getInstance().getAllGroupIds()
+                            );
+                resetWidget();
+
     }
 }
 
@@ -591,7 +612,10 @@ void AdminMenu::onAcceptGrInfoClicked()
     //DAO access add Group
         GeneralDAO::getInstance().addGroup(f_LeGroup->text());
 
-        backToMenu();
+        f_AllGroups->setModel(
+                    GeneralDAO::getInstance().getAllGroupIds()
+                    );
+        resetWidget();
     }
 }
 
@@ -639,7 +663,19 @@ void AdminMenu::onAcceptLessInfoClicked()
 
         GeneralDAO::getInstance().addLesson(less);
 
-        backToMenu();
+        f_AllLessons->setModel(
+                    GeneralDAO::getInstance().getAllLessons()
+                    );
+        f_LvAddLessonGroups->setModel(
+                    GeneralDAO::getInstance().getAllGroupIds()
+                    );
+        f_LvAddLessonUsers->setModel(
+                    GeneralDAO::getInstance().getAllTeacherLogins()
+                    );
+        f_LvAddLessonSubj->setModel(
+                    GeneralDAO::getInstance().getAllSubjects()
+                    );
+        resetWidget();
     }
 }
 
@@ -656,8 +692,160 @@ void AdminMenu::onAcceptSubjInfoClicked()
     {
     //DAO access add Subject
         GeneralDAO::getInstance().addSubject(f_LeSubject->text());
-        backToMenu();
+        f_AllSubjects->setModel(
+                    GeneralDAO::getInstance().getAllSubjects()
+                    );
+        resetWidget();
     }
+}
+
+void AdminMenu::onRemoveSt()
+{
+    if(f_AllStudents->selectionModel() == nullptr)
+    {
+        f_LblErr->show();
+        return;
+    }
+    else
+    {
+        if(f_AllStudents->selectionModel()->selectedRows().size() == 0)
+        {
+            f_LblErr->show();
+            return;
+        }
+    }
+
+    f_LblDAOErr->hide();
+    QSqlError err = GeneralDAO::getInstance().removeStudent(
+                f_AllStudents->model()->data(
+                    f_AllStudents->selectionModel()->selectedIndexes().at(2)).toString()
+                );
+
+    if(err.type() != QSqlError::NoError)
+    {
+        f_LblDAOErr->setText("Не удается удалить студента,\nтак как на него ссылаются другие сущности!");
+        f_LblDAOErr->show();
+        return;
+    }
+
+    f_AllStudents->setModel(
+                GeneralDAO::getInstance().getAllStudents()
+                );
+
+}
+
+void AdminMenu::onRemoveGr()
+{
+    if(f_AllGroups->selectionModel() == nullptr)
+    {
+        f_LblErr->show();
+        return;
+    }
+    else
+    {
+        if(f_AllGroups->selectionModel()->selectedRows().size() == 0)
+        {
+            f_LblErr->show();
+            return;
+        }
+    }
+
+    f_LblDAOErr->hide();
+    QSqlError err = GeneralDAO::getInstance().removeGroup(
+                f_AllGroups->model()->data(
+                    f_AllGroups->selectionModel()->selectedIndexes().at(0)).toString()
+                );
+    if(err.type() != QSqlError::NoError)
+    {
+        f_LblDAOErr->setText("Не удается удалить группу,\nтак как на нее ссылаются другие сущности!");
+        f_LblDAOErr->show();
+        return;
+    }
+
+    f_AllGroups->setModel(
+                GeneralDAO::getInstance().getAllGroupIds()
+                );
+}
+
+void AdminMenu::onRemoveLess()
+{
+    if(f_AllLessons->selectionModel() == nullptr)
+    {
+        f_LblErr->show();
+        return;
+    }
+    else
+    {
+        if(f_AllLessons->selectionModel()->selectedRows().size() == 0)
+        {
+            f_LblErr->show();
+            return;
+        }
+    }
+
+
+    f_LblDAOErr->hide();
+    QSqlError err = GeneralDAO::getInstance().removeLesson(
+                GeneralDAO::getInstance().getLessonIdByPK(
+                    f_AllLessons->model()->data(
+                        f_AllLessons->selectionModel()->selectedIndexes().at(2)).toString()
+                    ,
+                    f_AllLessons->model()->data(
+                        f_AllLessons->selectionModel()->selectedIndexes().at(1)).toString()
+                    )
+                );
+    if(err.type() != QSqlError::NoError)
+    {
+        f_LblDAOErr->setText("Не удается удалить занятие,\nтак как на него ссылаются другие сущности!");
+        f_LblDAOErr->show();
+        return;
+    }
+
+    f_AllLessons->setModel(
+                GeneralDAO::getInstance().getAllLessons()
+                );
+    f_LvAddLessonGroups->setModel(
+                GeneralDAO::getInstance().getAllGroupIds()
+                );
+    f_LvAddLessonUsers->setModel(
+                GeneralDAO::getInstance().getAllTeacherLogins()
+                );
+    f_LvAddLessonSubj->setModel(
+                GeneralDAO::getInstance().getAllSubjects()
+                );
+}
+
+void AdminMenu::onRemoveSubj()
+{
+    if(f_AllSubjects->selectionModel() == nullptr)
+    {
+        f_LblErr->show();
+        return;
+    }
+    else
+    {
+        if(f_AllSubjects->selectionModel()->selectedRows().size() == 0)
+        {
+            f_LblErr->show();
+            return;
+        }
+    }
+
+    f_LblDAOErr->hide();
+    QSqlError err = GeneralDAO::getInstance().removeSubject(
+                f_AllSubjects->model()->data(
+                    f_AllSubjects->selectionModel()->selectedIndexes().at(0)).toString()
+                );
+    if(err.type() != QSqlError::NoError)
+    {
+        f_LblDAOErr->setText("Не удается удалить предмет,\nтак как на него ссылаются другие сущности!");
+        f_LblDAOErr->show();
+        return;
+    }
+
+    f_AllSubjects->setModel(
+                GeneralDAO::getInstance().getAllSubjects()
+                );
 }
 
 void AdminMenu::onRemoveSt()
