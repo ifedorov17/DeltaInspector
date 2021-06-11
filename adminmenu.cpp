@@ -328,7 +328,6 @@ AdminMenu::AdminMenu(QWidget *parent)
     f_WidAttCheck->hide();
 
     connect(f_BtnRefresh, SIGNAL(clicked()), this, SLOT(refreshAttData()));
-    //
 
     f_LvAddLessonGroups->setMaximumSize(1000,1000);
     f_LvAddLessonSubj->setMaximumSize(1000,1000);
@@ -840,6 +839,99 @@ void AdminMenu::onRemoveSubj()
     if(err.type() != QSqlError::NoError)
     {
         f_LblDAOErr->setText("Не удается удалить предмет,\nтак как на него ссылаются другие сущности!");
+        f_LblDAOErr->show();
+        return;
+    }
+
+    f_AllSubjects->setModel(
+                GeneralDAO::getInstance().getAllSubjects()
+                );
+}
+
+void AdminMenu::onRemoveSt()
+{
+    f_LblDAOErr->hide();
+    QSqlError err = GeneralDAO::getInstance().removeStudent(
+                f_AllStudents->model()->data(
+                    f_AllStudents->selectionModel()->selectedIndexes().at(0)).toString()
+                );
+
+    if(err.type() != QSqlError::NoError)
+    {
+        f_LblDAOErr->setText(err.text());
+        f_LblDAOErr->show();
+        return;
+    }
+
+    f_AllStudents->setModel(
+                GeneralDAO::getInstance().getAllStudents()
+                );
+
+}
+
+void AdminMenu::onRemoveGr()
+{
+    f_LblDAOErr->hide();
+    QSqlError err = GeneralDAO::getInstance().removeGroup(
+                f_AllGroups->model()->data(
+                    f_AllGroups->selectionModel()->selectedIndexes().at(0)).toString()
+                );
+    if(err.type() != QSqlError::NoError)
+    {
+        f_LblDAOErr->setText(err.text());
+        f_LblDAOErr->show();
+        return;
+    }
+
+    f_AllGroups->setModel(
+                GeneralDAO::getInstance().getAllGroupIds()
+                );
+}
+
+void AdminMenu::onRemoveLess()
+{
+
+    f_LblDAOErr->hide();
+    QSqlError err = GeneralDAO::getInstance().removeLesson(
+                GeneralDAO::getInstance().getLessonIdByPK(
+                    f_AllLessons->model()->data(
+                        f_AllLessons->selectionModel()->selectedIndexes().at(2)).toString()
+                    ,
+                    f_AllLessons->model()->data(
+                        f_AllLessons->selectionModel()->selectedIndexes().at(1)).toString()
+                    )
+                );
+    if(err.type() != QSqlError::NoError)
+    {
+        f_LblDAOErr->setText(err.text());
+        f_LblDAOErr->show();
+        return;
+    }
+
+    f_AllLessons->setModel(
+                GeneralDAO::getInstance().getAllLessons()
+                );
+    f_LvAddLessonGroups->setModel(
+                GeneralDAO::getInstance().getAllGroupIds()
+                );
+    f_LvAddLessonUsers->setModel(
+                GeneralDAO::getInstance().getAllTeacherLogins()
+                );
+    f_LvAddLessonSubj->setModel(
+                GeneralDAO::getInstance().getAllSubjects()
+                );
+}
+
+void AdminMenu::onRemoveSubj()
+{
+    f_LblDAOErr->hide();
+    QSqlError err = GeneralDAO::getInstance().removeSubject(
+                f_AllSubjects->model()->data(
+                    f_AllSubjects->selectionModel()->selectedIndexes().at(0)).toString()
+                );
+    if(err.type() != QSqlError::NoError)
+    {
+        f_LblDAOErr->setText(err.text());
         f_LblDAOErr->show();
         return;
     }
