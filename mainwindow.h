@@ -8,6 +8,7 @@
 #include <QMainWindow>
 #include "adminmenu.h"
 #include "QZXing.h"
+#include "zetachat.h"
 
 
 class MainWindow : public QMainWindow
@@ -65,6 +66,10 @@ private:
     QPushButton *f_BtnDecline;
     QLabel *f_LblDataRead;
 
+    //zetaChat
+
+    zetaChat *f_WidChat;
+    QPushButton *f_GoToChat;
 
 
     //admin menu instance
@@ -100,6 +105,8 @@ public slots:
     void onDeclined();
     void onAdminLogout();
     void onQueryError(const QString&);
+    void onGoToChat();
+    void onLeaveTheChat();
 
     void onTagGot(QString);
 
