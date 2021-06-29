@@ -40,7 +40,7 @@ MainWindow::MainWindow(QWidget *parent)
     f_LblWrong->hide();
 
     f_WidLogin->setLayout(f_LytLogin);
-    f_LytMain->addWidget(f_WidLogin,0,0);
+    f_LytMain->addWidget(f_WidLogin,1,0);
 
     connect(f_BtnLogin, SIGNAL(clicked()), this, SLOT(onLoginBtnClicked()));
     connect(this, SIGNAL(sigLoginAcceptedUser()), this, SLOT(onLoginAcceptedUser()));
@@ -63,7 +63,7 @@ MainWindow::MainWindow(QWidget *parent)
     f_LytGroups->addWidget(f_LvGroups,2,0,Qt::AlignmentFlag::AlignCenter);
 
     f_WidGroups->setLayout(f_LytGroups);
-    f_LytMain->addWidget(f_WidGroups,0,0);
+    f_LytMain->addWidget(f_WidGroups,1,0);
 
     f_WidGroups->hide();
 
@@ -87,7 +87,7 @@ MainWindow::MainWindow(QWidget *parent)
     f_LytTime->addWidget(f_LvTimes,2,0,Qt::AlignmentFlag::AlignCenter);
 
     f_WidTime->setLayout(f_LytTime);
-    f_LytMain->addWidget(f_WidTime,0,0);
+    f_LytMain->addWidget(f_WidTime,1,0);
 
     f_WidTime->hide();
 
@@ -113,7 +113,7 @@ MainWindow::MainWindow(QWidget *parent)
 
     f_WidCam->setLayout(f_LytCam);
 
-    f_LytMain->addWidget(f_WidCam,0,0);
+    f_LytMain->addWidget(f_WidCam,1,0);
 
     f_WidCam->hide();
     //
@@ -135,7 +135,7 @@ MainWindow::MainWindow(QWidget *parent)
 
     f_WidVer->setLayout(f_LytVer);
 
-    f_LytMain->addWidget(f_WidVer,0,0);
+    f_LytMain->addWidget(f_WidVer,1,0);
 
     f_WidVer->hide();
 
@@ -143,11 +143,36 @@ MainWindow::MainWindow(QWidget *parent)
 
     //admin menu instance
     f_AdmMenuIstc = new AdminMenu(this);
-    f_LytMain->addWidget(f_AdmMenuIstc,0,0);
+    f_LytMain->addWidget(f_AdmMenuIstc,1,0);
     f_AdmMenuIstc->hide();
     connect(f_AdmMenuIstc, SIGNAL(logout()), this, SLOT(onAdminLogout()));
     //
+
+
+    //zetaChat setup
+    f_GoToChat = new QPushButton("zetaChat",this);
+    f_GoToChat->hide();
+
+    connect(f_GoToChat, SIGNAL(clicked()), this, SLOT(onGoToChat()));
+
+    f_WidChat = new zetaChat(this);
+
+    f_WidChat->setIp("25.105.140.239");
+    f_WidChat->setPort("1881");
+
+    f_LytMain->addWidget(f_WidChat,1,0);
+    f_LytMain->addWidget(f_GoToChat,0,0,Qt::AlignmentFlag::AlignLeft);
+    f_WidChat->hide();
+    //
+
     this->setCentralWidget(f_CentralWidget);
+
+
+
+    connect(f_WidChat, SIGNAL(logoutSig()), this, SLOT(onLeaveTheChat()));
+
+
+
 }
 
 MainWindow::~MainWindow()
@@ -208,6 +233,39 @@ void MainWindow::styling()
 "font: bold 12px;"
 "}"
 ""
+"QGroupBox {"
+"color: rgb(150,150,150);"
+"border: 2px solid rgb(56,56,56);"
+"border-radius: 4px;"
+"font: bold 12px;"
+"font-color: rgb(150,150,150);"
+"}"
+""
+"QTextEdit {"
+"color: rgb(150,150,150);"
+"border: 2px solid rgb(56,56,56);"
+"border-radius: 4px;"
+"font: bold 12px;"
+"font-color: rgb(150,150,150);"
+"}"
+""
+"QPlainTextEdit {"
+"color: rgb(150,150,150);"
+"border: 2px solid rgb(56,56,56);"
+"border-radius: 4px;"
+"font: bold 12px;"
+"font-color: rgb(150,150,150);"
+"}"
+""
+"QAbstractScrollArea {"
+"color: rgb(150,150,150);"
+"border: 2px solid rgb(56,56,56);"
+"border-radius: 4px;"
+"font: bold 12px;"
+"font-color: rgb(150,150,150);"
+"}"
+""
+""
 );
 
 }
@@ -255,6 +313,8 @@ void MainWindow::onLoginAcceptedUser()
 {
     f_WidLogin->hide();
     f_currentLogin = f_LeLogin->text();
+    f_WidChat->setName(f_currentLogin);
+    f_GoToChat->show();
     //DAO access, get groups by login
     f_LvGroups->setModel(GeneralDAO::getInstance().getGroupsByLogin(f_currentLogin));
     f_WidGroups->show();
@@ -345,6 +405,28 @@ void MainWindow::onQueryError(const QString& p_Error)
     this->statusBar()->showMessage(p_Error);
     Sleep(200);
     this->statusBar()->clearMessage();
+}
+
+void MainWindow::onGoToChat()
+{
+    f_WidCam->hide();
+    f_WidGroups->hide();
+    f_WidLogin->hide();
+    f_WidTime->hide();
+    f_WidVer->hide();
+    f_AdmMenuIstc->hide();
+
+    f_GoToChat->hide();
+
+    f_WidChat->on_pbConnect_clicked();
+    f_WidChat->show();
+}
+
+void MainWindow::onLeaveTheChat()
+{
+    f_WidChat->on_pbDisconnect_clicked();
+    f_WidChat->hide();
+    f_WidLogin->show();
 }
 
 void MainWindow::onTagGot(QString tag)

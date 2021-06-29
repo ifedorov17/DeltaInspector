@@ -23,8 +23,11 @@ SOURCES += \
     lesson.cpp \
     main.cpp \
     mainwindow.cpp \
+    myclient.cpp \
+    myserver.cpp \
     student.cpp \
-    visitings.cpp
+    visitings.cpp \
+    zetachat.cpp
 
 HEADERS += \
     QrEncoder.h \
@@ -32,8 +35,11 @@ HEADERS += \
     generaldao.h \
     lesson.h \
     mainwindow.h \
+    myclient.h \
+    myserver.h \
     student.h \
-    visitings.h
+    visitings.h \
+    zetachat.h
 
 include(src/QZXing.pri)
 include(src/QZXing-components.pri)
@@ -44,7 +50,8 @@ qnx: target.path = /tmp/$${TARGET}/bin
 else: unix:!android: target.path = /opt/$${TARGET}/bin
 !isEmpty(target.path): INSTALLS += target
 
-FORMS +=
+FORMS += \
+    zetachat.ui
 
 
 CONFIG(debug, debug|release) {
